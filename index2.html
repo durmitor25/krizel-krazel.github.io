@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="bs">
+  <head>
+    <meta charset="utf-8" />
+    <title>Cijena – Afnan 9 PM</title>
+  </head>
+  <body>
+    <h1>Afnan 9 PM</h1>
+    <div id="out">Učitavam...</div>
+
+    <script>
+      fetch("prices.json")
+        .then((r) => r.json())
+        .then((d) => {
+          document.getElementById("out").innerHTML = `
+            <p><a href="${d.url}" target="_blank">Link na shop</a></p>
+            <p>Trenutna cijena: <b>${d.current_price} €</b></p>
+            <p>Regularna cijena: ${
+              d.regular_price != null ? d.regular_price + " €" : "-"
+            }</p>
+          `;
+        })
+        .catch((e) => {
+          document.getElementById("out").textContent = "Greška: " + e;
+        });
+    </script>
+  </body>
+</html>
