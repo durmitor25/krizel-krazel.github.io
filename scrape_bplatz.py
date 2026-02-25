@@ -1,74 +1,113 @@
-import re, json, requests, os, smtplib
+import re
+import json
+import os
+import smtplib
 from email.message import EmailMessage
 from pathlib import Path
 
-URL = "https://bplatz.de/products/afnan-9-pm-eau-de-parfum-100ml?variant=54336510722316"
-HEADERS = {"User-Agent": "Mozilla/5.0"}
+import requests
+from bs4 import BeautifulSoup
+import yaml  # pip install pyyaml
+
 STATE_FILE = Path("prices.json")
+WATCH_FILE = Path("watch.yml")
 
-def parse_prices(html: str):
-    m_disc = re.search(
-        r"Regulärer Preis\s*€\s*([\d\.,]+).*?Verkaufspreis\s*€\s*([\d\.,]+)",
-        html, flags=re.DOTALL
-    )
-    if m_disc:
-        old_p = float(m_disc[1].replace(".", "").replace(",", "."))
-        new_p = float(m_disc[2].replace(".", "").replace(",", "."))
-        return old_p, new_p
-    m_simple = re.search(r"Verkaufspreis[^€]*€\s*([\d\.,]+)", html, flags=re.DOTALL)
-    if m_simple:
-        new_p = float(m_simple[1].replace(".", "").replace(",", "."))
-        return None, new_p
-    m_any = re.search(r"€\s*([\d]{1,3}(?:[.,][\d]{2})?)", html)
-    if m_any:
-        new_p = float(m_any.group(1).replace(".", "").replace(",", "."))
-        return None, new_p
-    return None, None
+def load_config():
+    cfg = yaml.safe_load(WATCH_FILE.read_text(encoding="utf-8"))
+    search_url = cfg["search_url"]
+    watch_names = [item["name"] for item in cfg.get("items", [])]
+    return search_url, watch_names
 
-def send_email(old_price, new_price):
+def normalize_price(s: str) -> float | None:
+    m = re.search(r"€\s*([\d]{1,3}(?:[.,][\d]{2})?)", s)
+    if not m:
+        return None
+    return float(m.group(1).replace(".", "").replace(",", "."))
+
+def fetch_products(search_url: str):
+    resp = requests.get(search_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+    resp.raise_for_status()
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    products = []
+    for a in soup.select("a[href*='/products/']"):
+        name = a.get_text(strip=True)
+        if not name:
+            continue
+        href = a["href"]
+        if not href.startswith("http"):
+            href = "https://bplatz.de" + href
+
+        card = a.find_parent("article") or a.find_parent("div")
+        text = card.get_text(" ", strip=True) if card else a.get_text(" ", strip=True)
+        price = normalize_price(text)
+        if price is None:
+            continue
+
+        products.append({"name": name, "url": href, "price": price})
+
+    return products
+
+def send_email(name: str, url: str, old_price: float | None, new_price: float):
     user = os.environ.get("EMAIL_USER")
     pwd = os.environ.get("EMAIL_PASS")
-    to  = os.environ.get("EMAIL_TO")
+    to = os.environ.get("EMAIL_TO")
     if not (user and pwd and to):
         print("EMAIL_* env var nisu podešene, preskačem e-mail.")
         return
 
     msg = EmailMessage()
-    msg["Subject"] = f"[BPlatz] Nova cijena: {new_price} €"
+    msg["Subject"] = f"[BPlatz] Nova cijena: {name} {new_price} €"
     msg["From"] = user
     msg["To"] = to
     body = (
-        f"Proizvod: {URL}\n"
+        f"Proizvod: {name}\n"
+        f"URL: {url}\n"
         f"Stara cijena: {old_price} €\n"
         f"Nova cijena: {new_price} €\n"
     )
     msg.set_content(body)
 
-    # primjer za Gmail SMTP s app passwordom
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(user, pwd)
         smtp.send_message(msg)
 
-# --- glavni dio ---
-resp = requests.get(URL, headers=HEADERS, timeout=30)
-resp.raise_for_status()
-old_p, new_p = parse_prices(resp.text)
+def load_state():
+    if not STATE_FILE.exists():
+        return {}
+    return json.loads(STATE_FILE.read_text(encoding="utf-8"))
 
-new_state = {
-    "url": URL,
-    "regular_price": old_p,
-    "current_price": new_p,
-}
+def save_state(state):
+    STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
-old_state = None
-if STATE_FILE.exists():
-    old_state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+def main():
+    search_url, watch_names = load_config()
+    old_state = load_state()  # { name: {price, url} }
+    products = fetch_products(search_url)
+    by_name = {p["name"]: p for p in products}
 
-# ako se promijenila current_price -> pošalji mail
-if old_state and old_state.get("current_price") != new_p:
-    print("Cijena se promijenila, šaljem e-mail...")
-    send_email(old_state.get("current_price"), new_p)
-else:
-    print("Nema promjene cijene.")
+    new_state = {}
+    for name in watch_names:
+        p = by_name.get(name)
+        if not p:
+            print(f"[WARN] Nema proizvoda na search stranici: {name}")
+            continue
 
-STATE_FILE.write_text(json.dumps(new_state, ensure_ascii=False, indent=2), encoding="utf-8")
+        new_price = p["price"]
+        url = p["url"]
+
+        prev = old_state.get(name)
+        old_price = prev["price"] if prev else None
+
+        if old_price is not None and old_price != new_price:
+            print(f"Cijena se promijenila za {name}: {old_price} -> {new_price}")
+            send_email(name, url, old_price, new_price)
+        else:
+            print(f"Nema promjene za {name}: {new_price} €")
+
+        new_state[name] = {"price": new_price, "url": url}
+
+    save_state(new_state)
+
+if __name__ == "__main__":
+    main()
