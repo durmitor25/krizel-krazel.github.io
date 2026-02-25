@@ -36,12 +36,27 @@ def fetch_product(item):
     price = normalize_price(text)
 
     # slika (opcijski)
+    #img_url = None
+    #img = soup.select_one("img")
+    #if img and img.get("src"):
+        #img_url = img["src"]
+        #if not img_url.startswith("http"):
+            #img_url = "https://bplatz.de" + img_url
+
+        # slika - preciznije traženje preko meta taga
     img_url = None
-    img = soup.select_one("img")
-    if img and img.get("src"):
-        img_url = img["src"]
-        if not img_url.startswith("http"):
+    # Shopify stranice imaju og:image tag koji je savršen za ovo
+    img_tag = soup.find("meta", property="og:image")
+    
+    if img_tag and img_tag.get("content"):
+        img_url = img_tag["content"]
+        # Ako link počinje sa // (čest slučaj na Shopify), dodaj https:
+        if img_url.startswith("//"):
+            img_url = "https:" + img_url
+        # Ako je link relativan (npr. /cdn/...)
+        elif img_url.startswith("/"):
             img_url = "https://bplatz.de" + img_url
+
 
     return {
         "name": item["name"],

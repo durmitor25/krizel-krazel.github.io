@@ -1,19 +1,24 @@
-<div id="out">Učitavam...</div>
-
 <script>
   fetch("prices.json")
     .then(r => r.json())
     .then(d => {
-      // ako je više parfema po imenu, uzmi prvi:
-      const firstKey = Object.keys(d)[0];
-      const item = d[firstKey];
+      const output = document.getElementById("out");
+      output.innerHTML = ""; // Očisti "Učitavam..."
 
-      document.getElementById("out").innerHTML = `
-        <h2>${firstKey}</h2>
-        ${item.image ? `<img src="${item.image}" alt="${firstKey}" style="max-width:200px;">` : ""}
-        <p><a href="${item.url}" target="_blank">Link na shop</a></p>
-        <p>Trenutna cijena: <b>${item.price} €</b></p>
-      `;
+      // Prolazimo kroz sve parfeme u JSON fajlu
+      Object.keys(d).forEach(name => {
+        const item = d[name];
+        
+        // Dodajemo HTML za svaki parfem (primijeti += operator)
+        output.innerHTML += `
+          <div style="border-bottom: 1px solid #ccc; margin-bottom: 20px; padding-bottom: 10px;">
+            <h2>${name}</h2>
+            ${item.image ? `<img src="${item.image}" alt="${name}" style="max-width:200px; display:block;">` : ""}
+            <p><a href="${item.url}" target="_blank">Link na shop</a></p>
+            <p>Trenutna cijena: <b>${item.price} €</b></p>
+          </div>
+        `;
+      });
     })
     .catch(e => {
       document.getElementById("out").textContent = "Greška: " + e;
