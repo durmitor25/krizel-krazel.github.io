@@ -55,14 +55,18 @@ def fetch_product(item):
         if img and img.get("data-src"):
             img_url = img["data-src"]
     
-    # Normalizuj URL slike
+    # Normalizuj URL slike - dinamički hvata domenu
     if img_url:
         if img_url.startswith("//"):
             img_url = "https:" + img_url
         elif img_url.startswith("http://"):
             img_url = img_url.replace("http://", "https://")
         elif not img_url.startswith("http"):
-            img_url = "https://bplatz.de" + img_url
+            # Dinamički hvata domenu umjesto fiksnog bplatz.de
+            from urllib.parse import urlparse
+            parsed_url = urlparse(url)
+            base_url = f"https://{parsed_url.netloc}"
+            img_url = base_url + img_url
 
     return {
         "name": item["name"],
