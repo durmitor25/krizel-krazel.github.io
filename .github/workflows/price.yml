@@ -8,6 +8,10 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    env:
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}
+      EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+      EMAIL_TO:   ${{ secrets.EMAIL_TO }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
