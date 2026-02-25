@@ -1,28 +1,21 @@
-<!doctype html>
-<html lang="bs">
-  <head>
-    <meta charset="utf-8" />
-    <title>Cijena – Afnan 9 PM</title>
-  </head>
-  <body>
-    <h1>Afnan 9 PM</h1>
-    <div id="out">Učitavam...</div>
+<div id="out">Učitavam...</div>
 
-    <script>
-      fetch("prices.json")
-        .then((r) => r.json())
-        .then((d) => {
-          document.getElementById("out").innerHTML = `
-            <p><a href="${d.url}" target="_blank">Link na shop</a></p>
-            <p>Trenutna cijena: <b>${d.current_price} €</b></p>
-            <p>Regularna cijena: ${
-              d.regular_price != null ? d.regular_price + " €" : "-"
-            }</p>
-          `;
-        })
-        .catch((e) => {
-          document.getElementById("out").textContent = "Greška: " + e;
-        });
-    </script>
-  </body>
-</html>
+<script>
+  fetch("prices.json")
+    .then(r => r.json())
+    .then(d => {
+      // ako je više parfema po imenu, uzmi prvi:
+      const firstKey = Object.keys(d)[0];
+      const item = d[firstKey];
+
+      document.getElementById("out").innerHTML = `
+        <h2>${firstKey}</h2>
+        ${item.image ? `<img src="${item.image}" alt="${firstKey}" style="max-width:200px;">` : ""}
+        <p><a href="${item.url}" target="_blank">Link na shop</a></p>
+        <p>Trenutna cijena: <b>${item.price} €</b></p>
+      `;
+    })
+    .catch(e => {
+      document.getElementById("out").textContent = "Greška: " + e;
+    });
+</script>

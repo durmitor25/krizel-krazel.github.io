@@ -44,7 +44,21 @@ def fetch_products(search_url: str):
         if price is None:
             continue
 
-        products.append({"name": name, "url": href, "price": price})
+        # probaj naći sliku u kartici
+        img_url = None
+        if card:
+            img = card.select_one("img")
+            if img and img.get("src"):
+                img_url = img["src"]
+                if not img_url.startswith("http"):
+                    img_url = "https://bplatz.de" + img_url
+
+        products.append({
+            "name": name,
+            "url": href,
+            "price": price,
+            "image": img_url,
+        })
 
     return products
 
