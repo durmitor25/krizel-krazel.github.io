@@ -98,7 +98,12 @@
         }
 
         header p {
-            display: none;
+            display: block;
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-style: italic;
+            margin-top: 12px;
+            letter-spacing: 0.5px;
         }
 
         #out {
@@ -140,8 +145,8 @@
 
         .parfem-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
             animation: fadeInGrid 0.8s ease-out 0.2s both;
         }
 
@@ -160,7 +165,7 @@
             background: white;
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 28px;
+            padding: 16px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
@@ -192,9 +197,9 @@
 
         .parfem-card h2 {
             font-family: 'Raleway', sans-serif;
-            font-size: 0.56rem;
+            font-size: 0.45rem;
             color: var(--primary);
-            margin-bottom: 16px;
+            margin-bottom: 10px;
             font-weight: 300;
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -202,11 +207,11 @@
 
         .image-container {
             width: 100%;
-            height: 200px;
+            height: 140px;
             background: #ffffff;
             border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -230,44 +235,44 @@
         }
 
         .price-section {
-            margin-bottom: 20px;
-            padding-bottom: 16px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
             border-bottom: 1px solid var(--border);
         }
 
         .price-label {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             color: var(--accent);
             text-transform: uppercase;
             letter-spacing: 1px;
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .price-value {
-            font-size: 1.26rem;
+            font-size: 0.95rem;
             font-family: 'Raleway', sans-serif;
             color: var(--accent);
             font-weight: 300;
         }
 
         .old-price {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: #999;
             text-decoration: line-through;
-            margin-top: 4px;
+            margin-top: 2px;
             font-weight: 300;
         }
 
         .shop-link {
             display: inline-block;
-            padding: 12px 24px;
+            padding: 8px 16px;
             background: linear-gradient(135deg, var(--accent), #8b6a52);
             color: white;
             text-decoration: none;
             border-radius: 6px;
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 0.75rem;
             transition: all 0.3s ease;
             letter-spacing: 0.5px;
         }
@@ -312,6 +317,7 @@
     <div class="container">
         <header>
             <h1>Krizel-Krazel</h1>
+            <p>Moj omiljeni parfemi i njihove cijene</p>
         </header>
         <div id="out" class="loading">Učitavam podatke...</div>
     </div>
