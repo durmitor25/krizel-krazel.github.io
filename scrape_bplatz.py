@@ -120,11 +120,15 @@ def main():
         url = prod["url"]
 
         prev = old_state.get(name)
-        old_price = prev["price"] if prev else None
+        current_price = prev["price"] if prev else None
+        old_price = prev.get("old_price")  # Prethodna stara cijena
 
-        if old_price is not None and new_price is not None and old_price != new_price:
-            print(f"Cijena se promijenila za {name}: {old_price} -> {new_price}")
-            send_email(name, url, old_price, new_price)
+        if current_price is not None and new_price is not None and current_price != new_price:
+            print(f"Cijena se promijenila za {name}: {current_price} -> {new_price}")
+            send_email(name, url, current_price, new_price)
+            
+            # Stara cijena postaje trenutna (bez obzira da li je veća ili manja)
+            old_price = current_price
         else:
             print(f"Nema promjene za {name}: {new_price} €")
 
@@ -132,7 +136,7 @@ def main():
             "price": new_price,
             "url": url,
             "image": prod["image"],
-            "old_price": old_price,  # Spremi staru cijenu za HTML prikaz
+            "old_price": old_price,  # Spremi staru cijenu za svaku promjenu
         }
 
     save_state(new_state)

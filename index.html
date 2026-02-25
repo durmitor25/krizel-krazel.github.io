@@ -77,7 +77,7 @@
 
         header h1 {
             font-family: 'Raleway', sans-serif;
-            font-size: 2.45rem;
+            font-size: 1.2rem;
             font-weight: 300;
             color: var(--primary);
             letter-spacing: 3px;
@@ -197,7 +197,7 @@
 
         .parfem-card h2 {
             font-family: 'Raleway', sans-serif;
-            font-size: 1.12rem;
+            font-size: 0.56rem;
             color: var(--primary);
             margin-bottom: 16px;
             font-weight: 300;
@@ -208,7 +208,7 @@
         /* Image container */
         .image-container {
             width: 100%;
-            height: 280px;
+            height: 180px;
             background: var(--light);
             border-radius: 8px;
             overflow: hidden;
@@ -255,6 +255,14 @@
             font-size: 1.26rem;
             font-family: 'Raleway', sans-serif;
             color: var(--accent);
+            font-weight: 300;
+        }
+
+        .old-price {
+            font-size: 0.9rem;
+            color: #999;
+            text-decoration: line-through;
+            margin-top: 4px;
             font-weight: 300;
         }
 
@@ -362,17 +370,23 @@
                         imageHTML = '<div class="image-container"><p class="no-image">Nema dostupne slike</p></div>';
                     }
 
+                    let cijenaHTML = `<div class="price-value">${item.price ? item.price + " €" : "—"}</div>`;
+                    if (item.old_price) {
+                        cijenaHTML = `
+                            <div class="price-value" style="color: #27ae60;">${item.price} €</div>
+                            <div class="old-price">${item.old_price} €</div>
+                        `;
+                    }
+
                     card.innerHTML = `
                         ${imageHTML}
                         <h2>${name}</h2>
                         <div class="price-section">
                             <span class="price-label">Cijena</span>
-                            <div class="price-value">${item.price ? item.price + " €" : "—"}</div>
+                            ${cijenaHTML}
                         </div>
                         <a href="${item.url || '#'}" target="_blank" class="shop-link">Pogledaj na shopu →</a>
                     `;
-
-                    grid.appendChild(card);
                 });
 
                 output.appendChild(grid);
