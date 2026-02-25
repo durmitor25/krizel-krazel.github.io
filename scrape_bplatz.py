@@ -48,14 +48,15 @@ def fetch_product(item):
     # Shopify stranice imaju og:image tag koji je savršen za ovo
     img_tag = soup.find("meta", property="og:image")
     
-    if img_tag and img_tag.get("content"):
-        img_url = img_tag["content"]
-        # Ako link počinje sa // (čest slučaj na Shopify), dodaj https:
-        if img_url.startswith("//"):
-            img_url = "https:" + img_url
-        # Ako je link relativan (npr. /cdn/...)
-        elif img_url.startswith("/"):
-            img_url = "https://bplatz.de" + img_url
+    # U tvom fetch_product dijelu:
+    if img_url:
+      if img_url.startswith("//"):
+          img_url = "https:" + img_url
+      elif img_url.startswith("http://"):
+          img_url = img_url.replace("http://", "https://") # DODAJ OVU LINIJU
+      elif not img_url.startswith("http"):
+          img_url = "https://bplatz.de" + img_url
+
 
 
     return {
