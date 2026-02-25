@@ -36,7 +36,7 @@ def fetch_products(search_url: str):
             continue
         href = a["href"]
         if not href.startswith("http"):
-            href = "https://bplatz.de" + href
+            href = "https://bplatz.de/collections/all-products" + href
 
         card = a.find_parent("article") or a.find_parent("div")
         text = card.get_text(" ", strip=True) if card else a.get_text(" ", strip=True)
@@ -51,7 +51,7 @@ def fetch_products(search_url: str):
             if img and img.get("src"):
                 img_url = img["src"]
                 if not img_url.startswith("http"):
-                    img_url = "https://bplatz.de" + img_url
+                    img_url = "https://bplatz.de/collections/all-products" + img_url
 
         products.append({
             "name": name,
