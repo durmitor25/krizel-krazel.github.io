@@ -35,29 +35,34 @@ def fetch_product(item):
     text = soup.get_text(" ", strip=True)
     price = normalize_price(text)
 
-    # slika (opcijski)
-    #img_url = None
-    #img = soup.select_one("img")
-    #if img and img.get("src"):
-        #img_url = img["src"]
-        #if not img_url.startswith("http"):
-            #img_url = "https://bplatz.de" + img_url
-
-        # slika - preciznije traženje preko meta taga
+    # slika - prvo pokušaj og:image, zatim product image, zatim bilo koja slika
     img_url = None
-    # Shopify stranice imaju og:image tag koji je savršen za ovo
-    img_tag = soup.find("meta", property="og:image")
     
-    # U tvom fetch_product dijelu:
+    # 1. Pokušaj og:image (Shopify meta tag)
+    img_tag = soup.find("meta", property="og:image")
+    if img_tag and img_tag.get("content"):
+        img_url = img_tag["content"]
+    
+    # 2. Ako nije pronađena, pokušaj direktno img tag sa src
+    if not img_url:
+        img = soup.find("img")
+        if img and img.get("src"):
+            img_url = img["src"]
+    
+    # 3. Pokušaj data-src (lazy loading slike)
+    if not img_url:
+        img = soup.find("img", {"data-src": True})
+        if img and img.get("data-src"):
+            img_url = img["data-src"]
+    
+    # Normalizuj URL slike
     if img_url:
-      if img_url.startswith("//"):
-          img_url = "https:" + img_url
-      elif img_url.startswith("http://"):
-          img_url = img_url.replace("http://", "https://") # DODAJ OVU LINIJU
-      elif not img_url.startswith("http"):
-          img_url = "https://bplatz.de" + img_url
-
-
+        if img_url.startswith("//"):
+            img_url = "https:" + img_url
+        elif img_url.startswith("http://"):
+            img_url = img_url.replace("http://", "https://")
+        elif not img_url.startswith("http"):
+            img_url = "https://bplatz.de" + img_url
 
     return {
         "name": item["name"],
@@ -105,7 +110,7 @@ def save_state(state):
 
 def main():
     items = load_items()
-    old_state = load_state()  # { name: {price, url, image} }
+    old_state = load_state()  # { name: {price, url, image, old_price} }
     new_state = {}
 
     for item in items:
@@ -127,6 +132,7 @@ def main():
             "price": new_price,
             "url": url,
             "image": prod["image"],
+            "old_price": old_price,  # Spremi staru cijenu za HTML prikaz
         }
 
     save_state(new_state)
