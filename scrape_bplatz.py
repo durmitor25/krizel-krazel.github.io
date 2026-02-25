@@ -113,23 +113,32 @@ def main():
         name = prod["name"]
         new_price = prod["price"]
         url = prod["url"]
+        image = prod
 
+        # 1. VUČEMO STARU CIJENU: Iz onoga što je trenutno zapisano u prices.json
         prev = old_state.get(name)
-        old_price = prev["price"] if prev else None
+        old_price = prev.get("price") if prev else None
+        
+        # Inicijalno, stara cijena u JSON-u će biti ista kao nova 
+        # OSIM ako se desila promjena
+        saved_old_price = prev.get("old_price") if prev else None
 
         if old_price is not None and new_price is not None and old_price != new_price:
             print(f"Cijena se promijenila za {name}: {old_price} -> {new_price}")
             send_email(name, url, old_price, new_price)
-        else:
-            print(f"Nema promjene za {name}: {new_price} €")
-
+            # Ako se cijena promijenila, stara cijena postaje ona koja je bila do maloprije
+            saved_old_price = old_price
+        
+        # 2. ZAPISUJEMO NOVO STANJE: Spremamo i trenutnu i staru cijenu za HTML
         new_state[name] = {
             "price": new_price,
+            "old_price": saved_old_price, # Ovo će HTML koristiti da precrta cijenu
             "url": url,
-            "image": prod["image"],
+            "image": image,
         }
 
     save_state(new_state)
+
 
 
 if __name__ == "__main__":

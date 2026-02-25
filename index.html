@@ -315,68 +315,76 @@
     </style>
 </head>
 <body>
-    </div> <!-- Zatvaranje container diva iz tvog koda -->
+    <div class="container">
+        <header>
+            <h1>Krizel-Krazel</h1>
+            <p>Elegantno praćenje cijena parfema</p>
+        </header>
+
+        <div id="out" class="loading">Učitavam podatke...</div>
+    </div>
 
     <script>
-      fetch("./prices.json")
-        .then(response => {
-          if (!response.ok) throw new Error("Ne mogu učitati podatke.");
-          return response.json();
-        })
-        .then(data => {
-          const output = document.getElementById("out");
-          const keys = Object.keys(data);
+        fetch("./prices.json")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ne mogu učitati prices.json (Status: " + response.status + ")");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Učitani podaci:", data);
+                const output = document.getElementById("out");
 
-          if (keys.length === 0) {
-            output.innerHTML = '<div class="empty-state"><p>Trenutno nema parfema na listi.</p></div>';
-            return;
-          }
+                if (!data || Object.keys(data).length === 0) {
+                    output.innerHTML = '<div class="empty-state"><p>JSON je prazan. Dodaj podatke u prices.json</p></div>';
+                    return;
+                }
 
-          // Generisanje grida
-          let gridHTML = '<div class="parfem-grid">';
+                output.innerHTML = "";
+                const grid = document.createElement("div");
+                grid.className = "parfem-grid";
 
-          keys.forEach(name => {
-            const item = data[name];
-            
-            // Logika za detekciju popusta (ako dodaš old_price u budućnosti)
-            const imaPopust = item.old_price && item.price < item.old_price;
-            
-            gridHTML += `
-              <div class="parfem-card">
-                ${imaPopust ? '<span style="position:absolute; top:10px; right:10px; background:#e74c3c; color:white; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:bold; z-index:2;">AKCIJA</span>' : ''}
-                
-                <h2>${name}</h2>
-                
-                <div class="image-container">
-                  ${item.image 
-                    ? `<img src="${item.image}" alt="${name}" loading="lazy">` 
-                    : '<span class="no-image">Slika nije dostupna</span>'}
-                </div>
+                Object.keys(data).forEach((name, index) => {
+                    const item = data[name];
+                    const card = document.createElement("div");
+                    card.className = "parfem-card";
+                    card.style.animationDelay = (index * 0.08) + "s";
 
-                <div class="price-section">
-                  <span class="price-label">Trenutna cijena</span>
-                  <div class="price-value">
-                    ${imaPopust ? `<s style="color:#999; font-size:0.8em; margin-right:8px;">${item.old_price} €</s>` : ''}
-                    <span style="${imaPopust ? 'color:#e74c3c; font-weight:bold;' : ''}">${item.price} €</span>
-                  </div>
-                </div>
+                    let imageHTML = '';
+                    if (item.image) {
+                        imageHTML = `
+                            <div class="image-container">
+                                <img src="${item.image}" alt="${name}" loading="lazy">
+                            </div>
+                        `;
+                    } else {
+                        imageHTML = '<div class="image-container"><p class="no-image">Nema dostupne slike</p></div>';
+                    }
 
-                <a href="${item.url}" target="_blank" class="shop-link">Pogledaj na shopu</a>
-              </div>
-            `;
-          });
+                    card.innerHTML = `
+                        ${imageHTML}
+                        <h2>${name}</h2>
+                        <div class="price-section">
+                            <span class="price-label">Cijena</span>
+                            <div class="price-value">${item.price ? item.price + " €" : "—"}</div>
+                        </div>
+                        <a href="${item.url || '#'}" target="_blank" class="shop-link">Pogledaj na shopu →</a>
+                    `;
 
-          gridHTML += '</div>';
-          output.innerHTML = gridHTML;
-        })
-        .catch(error => {
-          document.getElementById("out").innerHTML = `
-            <div class="error">
-              <p>Nažalost, došlo je do greške pri učitavanju podataka.</p>
-              <small>${error.message}</small>
-            </div>
-          `;
-        });
+                    grid.appendChild(card);
+                });
+
+                output.appendChild(grid);
+            })
+            .catch(error => {
+                console.error("Greška:", error);
+                document.getElementById("out").innerHTML = `
+                    <div class="error">
+                        <strong>Greška pri učitavanju:</strong><br>${error.message}
+                    </div>
+                `;
+            });
     </script>
 </body>
 </html>
