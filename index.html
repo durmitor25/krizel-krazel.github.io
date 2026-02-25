@@ -1,26 +1,54 @@
-<script>
-  fetch("prices.json")
-    .then(r => r.json())
-    .then(d => {
-      const output = document.getElementById("out");
-      output.innerHTML = ""; // Očisti "Učitavam..."
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>Praćenje Cijena Parfema</title>
+    <style>
+        .parfem-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        img { display: block; margin-top: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Lista Parfema</h1>
+    <div id="out">Učitavam podatke...</div>
 
-      // Prolazimo kroz sve parfeme u JSON fajlu
-      Object.keys(d).forEach(name => {
-        const item = d[name];
-        
-        // Dodajemo HTML za svaki parfem (primijeti += operator)
-        output.innerHTML += `
-          <div style="border-bottom: 1px solid #ccc; margin-bottom: 20px; padding-bottom: 10px;">
-            <h2>${name}</h2>
-            ${item.image ? `<img src="${item.image}" alt="${name}" style="max-width:200px; display:block;">` : ""}
-            <p><a href="${item.url}" target="_blank">Link na shop</a></p>
-            <p>Trenutna cijena: <b>${item.price} €</b></p>
-          </div>
-        `;
-      });
-    })
-    .catch(e => {
-      document.getElementById("out").textContent = "Greška: " + e;
-    });
-</script>
+    <script>
+      // Koristimo relativnu putanju "./prices.json" da izbjegnemo probleme na GitHub Pages
+      fetch("./prices.json")
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Ne mogu učitati prices.json (Status: " + response.status + ")");
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("Učitani podaci:", data); // Ovo vidiš u F12 konzoli
+          const output = document.getElementById("out");
+          
+          if (Object.keys(data).length === 0) {
+            output.textContent = "JSON je prazan.";
+            return;
+          }
+
+          output.innerHTML = ""; // Brišemo poruku "Učitavam..."
+
+          // Prolazimo kroz sve parfeme
+          Object.keys(data).forEach(name => {
+            const item = data[name];
+            output.innerHTML += `
+              <div class="parfem-card">
+                <h2>${name}</h2>
+                ${item.image ? `<img src="${item.image}" alt="${name}" style="max-width:200px;">` : "<i>Nema slike</i>"}
+                <p>Cijena: <b>${item.price ? item.price + " €" : "Nije pronađena"}</b></p>
+                <p><a href="${item.url}" target="_blank">Pogledaj na shopu</a></p>
+              </div>
+            `;
+          });
+        })
+        .catch(error => {
+          console.error("Greška:", error);
+          document.getElementById("out").innerHTML = `<b style="color:red;">Greška pri učitavanju: ${error.message}</b>`;
+        });
+    </script>
+</body>
+</html>
