@@ -34,7 +34,6 @@
             overflow-x: hidden;
         }
 
-        /* Subtle background pattern */
         body::before {
             content: '';
             position: fixed;
@@ -57,7 +56,6 @@
             z-index: 1;
         }
 
-        /* Header */
         header {
             text-align: center;
             margin-bottom: 60px;
@@ -103,7 +101,6 @@
             display: none;
         }
 
-        /* Loading and error states */
         #out {
             min-height: 300px;
         }
@@ -141,7 +138,6 @@
             margin: 40px 0;
         }
 
-        /* Grid Layout */
         .parfem-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -160,7 +156,6 @@
             }
         }
 
-        /* Parfem Card */
         .parfem-card {
             background: white;
             border: 1px solid var(--border);
@@ -205,7 +200,6 @@
             text-transform: uppercase;
         }
 
-        /* Image container */
         .image-container {
             width: 100%;
             height: 180px;
@@ -235,7 +229,6 @@
             font-style: italic;
         }
 
-        /* Price section */
         .price-section {
             margin-bottom: 20px;
             padding-bottom: 16px;
@@ -266,7 +259,6 @@
             font-weight: 300;
         }
 
-        /* Link */
         .shop-link {
             display: inline-block;
             padding: 12px 24px;
@@ -289,7 +281,6 @@
             transform: translateX(1px);
         }
 
-        /* Empty state */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -301,7 +292,6 @@
             font-style: italic;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .container {
                 padding: 30px 16px;
@@ -315,10 +305,6 @@
                 grid-template-columns: 1fr;
                 gap: 24px;
             }
-
-            header p {
-                font-size: 0.9rem;
-            }
         }
     </style>
 </head>
@@ -326,26 +312,23 @@
     <div class="container">
         <header>
             <h1>Krizel-Krazel</h1>
-            <p>Elegantno praćenje cijena parfema</p>
         </header>
-
         <div id="out" class="loading">Učitavam podatke...</div>
     </div>
 
     <script>
-        fetch("./prices.json")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Ne mogu učitati prices.json (Status: " + response.status + ")");
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Učitani podaci:", data);
-                const output = document.getElementById("out");
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error("Timeout - prices.json je spora")), 8000)
+        );
 
+        Promise.race([
+            fetch("./prices.json?t=" + Date.now()).then(r => r.json()),
+            timeoutPromise
+        ])
+            .then(data => {
+                const output = document.getElementById("out");
                 if (!data || Object.keys(data).length === 0) {
-                    output.innerHTML = '<div class="empty-state"><p>JSON je prazan. Dodaj podatke u prices.json</p></div>';
+                    output.innerHTML = '<div class="empty-state"><p>Nema podataka</p></div>';
                     return;
                 }
 
@@ -361,43 +344,24 @@
 
                     let imageHTML = '';
                     if (item.image) {
-                        imageHTML = `
-                            <div class="image-container">
-                                <img src="${item.image}" alt="${name}" loading="lazy">
-                            </div>
-                        `;
+                        imageHTML = `<div class="image-container"><img src="${item.image}" alt="${name}" loading="lazy" onerror="this.parentElement.innerHTML='<p class=\"no-image\">Nema slike</p>'"></div>`;
                     } else {
-                        imageHTML = '<div class="image-container"><p class="no-image">Nema dostupne slike</p></div>';
+                        imageHTML = '<div class="image-container"><p class="no-image">Nema slike</p></div>';
                     }
 
                     let cijenaHTML = `<div class="price-value">${item.price ? item.price + " €" : "—"}</div>`;
                     if (item.old_price) {
-                        cijenaHTML = `
-                            <div class="price-value" style="color: #27ae60;">${item.price} €</div>
-                            <div class="old-price">${item.old_price} €</div>
-                        `;
+                        cijenaHTML = `<div class="price-value" style="color: #27ae60;">${item.price} €</div><div class="old-price">${item.old_price} €</div>`;
                     }
 
-                    card.innerHTML = `
-                        ${imageHTML}
-                        <h2>${name}</h2>
-                        <div class="price-section">
-                            <span class="price-label">Cijena</span>
-                            ${cijenaHTML}
-                        </div>
-                        <a href="${item.url || '#'}" target="_blank" class="shop-link">Pogledaj na shopu →</a>
-                    `;
+                    card.innerHTML = `${imageHTML}<h2>${name}</h2><div class="price-section"><span class="price-label">Cijena</span>${cijenaHTML}</div><a href="${item.url || '#'}" target="_blank" class="shop-link">Pogledaj na shopu →</a>`;
+                    grid.appendChild(card);
                 });
 
                 output.appendChild(grid);
             })
             .catch(error => {
-                console.error("Greška:", error);
-                document.getElementById("out").innerHTML = `
-                    <div class="error">
-                        <strong>Greška pri učitavanju:</strong><br>${error.message}
-                    </div>
-                `;
+                document.getElementById("out").innerHTML = `<div class="error"><strong>⚠️ Greška:</strong><br>${error.message}</div>`;
             });
     </script>
 </body>
