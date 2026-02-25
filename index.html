@@ -1,3 +1,320 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krizel-Krazel | Praćenje Cijena Parfema</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2c2c2c;
+            --accent: #a17d5f;
+            --light: #f8f6f3;
+            --border: #e8e4df;
+            --text: #4a4a4a;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, #faf8f5 0%, #f3eeea 100%);
+            color: var(--text);
+            font-family: 'Lora', serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(161, 125, 95, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(161, 125, 95, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header h1 {
+            font-family: 'Raleway', sans-serif;
+            font-size: 2.45rem;
+            font-weight: 300;
+            color: var(--primary);
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            position: relative;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 1px;
+        }
+
+        header p {
+            display: none;
+        }
+
+        /* Loading and error states */
+        #out {
+            min-height: 300px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .error {
+            background: #fff5f5;
+            border: 1px solid #f5a5a5;
+            border-radius: 8px;
+            padding: 24px;
+            color: #8b2e2e;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        /* Grid Layout */
+        .parfem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 32px;
+            animation: fadeInGrid 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInGrid {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Parfem Card */
+        .parfem-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .parfem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease-out;
+        }
+
+        .parfem-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 12px 24px rgba(161, 125, 95, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .parfem-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .parfem-card h2 {
+            font-family: 'Raleway', sans-serif;
+            font-size: 1.12rem;
+            color: var(--primary);
+            margin-bottom: 16px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Image container */
+        .image-container {
+            width: 100%;
+            height: 280px;
+            background: var(--light);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .parfem-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .parfem-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .no-image {
+            color: var(--accent);
+            font-size: 0.95rem;
+            font-style: italic;
+        }
+
+        /* Price section */
+        .price-section {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .price-label {
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .price-value {
+            font-size: 1.26rem;
+            font-family: 'Raleway', sans-serif;
+            color: var(--accent);
+            font-weight: 300;
+        }
+
+        /* Link */
+        .shop-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent), #8b6a52);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .shop-link:hover {
+            transform: translateX(3px);
+            box-shadow: 0 8px 16px rgba(161, 125, 95, 0.2);
+        }
+
+        .shop-link:active {
+            transform: translateX(1px);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--accent);
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 16px;
+            }
+
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .parfem-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            header p {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
     </div> <!-- Zatvaranje container diva iz tvog koda -->
 
     <script>
