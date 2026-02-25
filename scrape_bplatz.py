@@ -126,11 +126,12 @@ def main():
         if current_price is not None and new_price is not None and current_price != new_price:
             print(f"Cijena se promijenila za {name}: {current_price} -> {new_price}")
             send_email(name, url, current_price, new_price)
-            
-            # Stara cijena postaje trenutna (bez obzira da li je veća ili manja)
+            # Spremi staru cijenu samo ako se promijenila
             old_price = current_price
         else:
             print(f"Nema promjene za {name}: {new_price} €")
+            # Ako nema promjene, ne dodjeljivaj old_price
+            old_price = None
 
         new_state[name] = {
             "price": new_price,
