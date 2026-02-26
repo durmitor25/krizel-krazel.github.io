@@ -145,9 +145,23 @@
 
         .parfem-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 20px;
             animation: fadeInGrid 0.8s ease-out 0.2s both;
+        }
+
+        @media (max-width: 768px) {
+            .parfem-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .parfem-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
         }
 
         @keyframes fadeInGrid {
@@ -317,7 +331,7 @@
     <div class="container">
         <header>
             <h1>Krizel-Krazel</h1>
-            <p>Praćenje cijena</p>
+            <p>Moj omiljeni parfemi i njihove cijene</p>
         </header>
         <div id="out" class="loading">Učitavam podatke...</div>
     </div>
