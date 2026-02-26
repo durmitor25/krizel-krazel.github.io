@@ -19,10 +19,17 @@ def load_items():
 
 
 def normalize_price(text: str) -> float | None:
+    # Prvo pokušaj sa € simbolom
     m = re.search(r"€\s*([\d]{1,3}(?:[.,][\d]{2})?)", text)
-    if not m:
-        return None
-    return float(m.group(1).replace(".", "").replace(",", "."))
+    if m:
+        return float(m.group(1).replace(".", "").replace(",", "."))
+    
+    # Ako nema €, pokušaj sa brojevima (format: "23,89")
+    m = re.search(r"([\d]{1,3}(?:[.,][\d]{2})?)", text)
+    if m:
+        return float(m.group(1).replace(".", "").replace(",", "."))
+    
+    return None
 
 
 def fetch_product(item):
@@ -43,6 +50,10 @@ def fetch_product(item):
     if compare_elem:
         old_price_text = compare_elem.get_text()
         old_price = normalize_price(old_price_text)
+    
+    # Ako je old_price ista kao price, nema popusta - postavi na null
+    if old_price and price and old_price == price:
+        old_price = None
     
     # Ako nema compare-at-price ali meta tag postoji, znači da nema popusta
     # old_price ostaje None
