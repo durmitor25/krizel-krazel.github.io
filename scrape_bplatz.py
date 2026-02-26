@@ -125,23 +125,22 @@ def main():
 
         prev = old_state.get(name)
         current_price = prev["price"] if prev else None
-        old_price = prev.get("old_price")  # Prethodna stara cijena
+        previous_old_price = prev.get("old_price") if prev else None
+        old_price = previous_old_price  # Zadržи staru old_price ako postoji
 
         if current_price is not None and new_price is not None and current_price != new_price:
             print(f"Cijena se promijenila za {name}: {current_price} -> {new_price}")
             send_email(name, url, current_price, new_price)
-            # Spremi staru cijenu samo ako se promijenila
+            # Nove cijena se ažurira, stara postaje current_price
             old_price = current_price
         else:
             print(f"Nema promjene za {name}: {new_price} €")
-            # Ako nema promjene, ne dodjeljivaj old_price
-            old_price = None
 
         new_state[name] = {
             "price": new_price,
             "url": url,
             "image": prod["image"],
-            "old_price": old_price,  # Spremi staru cijenu za svaku promjenu
+            "old_price": old_price,  # Spremi old_price (može biti null ili cijena)
         }
 
     save_state(new_state)
