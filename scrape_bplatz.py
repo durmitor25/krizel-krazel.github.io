@@ -31,36 +31,21 @@ def fetch_product(item):
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    # CIJENA - traži og:price:amount (aktivna cijena)
+    # CIJENA - traži og:price:amount meta tag (točna aktivna cijena)
     price = None
     meta_price = soup.find("meta", property="og:price:amount")
     if meta_price:
         price = normalize_price(meta_price.get("content", ""))
     
-    # Ako nije u meta tag-u, traži sve cijene i uzmi najmanju
-    if not price:
-        prices = []
-        for elem in soup.find_all(string=re.compile(r"€")):
-            p = normalize_price(str(elem))
-            if p:
-                prices.append(p)
-        price = min(prices) if prices else None
-    
-    # STARA CIJENA - ako postoji compare-at-price ili bilo koja viša cijena
+    # STARA CIJENA - traži hdt-compare-at-price element (precrtana cijena)
     old_price = None
-    compare_price_elem = soup.find("hdt-compare-at-price")
-    if compare_price_elem:
-        old_price = normalize_price(compare_price_elem.get_text())
+    compare_elem = soup.find("hdt-compare-at-price")
+    if compare_elem:
+        old_price_text = compare_elem.get_text()
+        old_price = normalize_price(old_price_text)
     
-    # Ako nema compare-at-price, traži sve cijene i uzmi najveću (ako je drugačija od trenutne)
-    if not old_price:
-        prices = []
-        for elem in soup.find_all(string=re.compile(r"€")):
-            p = normalize_price(str(elem))
-            if p and p != price:
-                prices.append(p)
-        # Ako postoji viša cijena, to je stara cijena
-        old_price = max(prices) if prices else None
+    # Ako nema compare-at-price ali meta tag postoji, znači da nema popusta
+    # old_price ostaje None
 
     # slika - prvo pokušaj og:image, zatim product image, zatim bilo koja slika
     img_url = None
