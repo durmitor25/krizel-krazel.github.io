@@ -31,24 +31,36 @@ def fetch_product(item):
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    # CIJENA - traži u specifičnim elementima (sale price prvo, zatim regular price)
+    # CIJENA - traži og:price:amount (aktivna cijena)
     price = None
+    meta_price = soup.find("meta", property="og:price:amount")
+    if meta_price:
+        price = normalize_price(meta_price.get("content", ""))
     
-    # 1. Pokušaj pronađi aktivnu/sale cijenu (obično je u <span class="price"> ili slično)
-    price_elem = soup.find("span", class_=re.compile(r"(price|sale|current)"))
-    if price_elem:
-        price = normalize_price(price_elem.get_text())
-    
-    # 2. Ako nije pronađena, traži u meta tag-u (Open Graph)
+    # Ako nije u meta tag-u, traži sve cijene i uzmi najmanju
     if not price:
-        meta_price = soup.find("meta", property="product:price:amount")
-        if meta_price:
-            price = normalize_price(meta_price.get("content", ""))
+        prices = []
+        for elem in soup.find_all(string=re.compile(r"€")):
+            p = normalize_price(str(elem))
+            if p:
+                prices.append(p)
+        price = min(prices) if prices else None
     
-    # 3. Ako nije pronađena, traži prvu cijenu na stranici
-    if not price:
-        text = soup.get_text(" ", strip=True)
-        price = normalize_price(text)
+    # STARA CIJENA - ako postoji compare-at-price ili bilo koja viša cijena
+    old_price = None
+    compare_price_elem = soup.find("hdt-compare-at-price")
+    if compare_price_elem:
+        old_price = normalize_price(compare_price_elem.get_text())
+    
+    # Ako nema compare-at-price, traži sve cijene i uzmi najveću (ako je drugačija od trenutne)
+    if not old_price:
+        prices = []
+        for elem in soup.find_all(string=re.compile(r"€")):
+            p = normalize_price(str(elem))
+            if p and p != price:
+                prices.append(p)
+        # Ako postoji viša cijena, to je stara cijena
+        old_price = max(prices) if prices else None
 
     # slika - prvo pokušaj og:image, zatim product image, zatim bilo koja slika
     img_url = None
@@ -88,6 +100,7 @@ def fetch_product(item):
         "url": url,
         "price": price,
         "image": img_url,
+        "old_price": old_price,  # Spremi staru cijenu ako postoji na stranici
     }
 
 
@@ -137,17 +150,21 @@ def main():
         name = prod["name"]
         new_price = prod["price"]
         url = prod["url"]
+        scraped_old_price = prod.get("old_price")  # Stara cijena sa stranice
 
         prev = old_state.get(name)
         current_price = prev["price"] if prev else None
         previous_old_price = prev.get("old_price") if prev else None
-        old_price = previous_old_price  # Zadržи staru old_price ako postoji
+        old_price = previous_old_price
 
         if current_price is not None and new_price is not None and current_price != new_price:
             print(f"Cijena se promijenila za {name}: {current_price} -> {new_price}")
             send_email(name, url, current_price, new_price)
-            # Nove cijena se ažurira, stara postaje current_price
             old_price = current_price
+        elif current_price is None and scraped_old_price:
+            # Prvi put - koristi old_price sa stranice
+            old_price = scraped_old_price
+            print(f"Prvi put - {name}: nova {new_price} €, stara {scraped_old_price} €")
         else:
             print(f"Nema promjene za {name}: {new_price} €")
 
@@ -155,7 +172,7 @@ def main():
             "price": new_price,
             "url": url,
             "image": prod["image"],
-            "old_price": old_price,  # Spremi old_price (može biti null ili cijena)
+            "old_price": old_price,
         }
 
     save_state(new_state)
