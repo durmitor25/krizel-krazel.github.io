@@ -31,9 +31,24 @@ def fetch_product(item):
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    # cijenu tražimo u cijelom tekstu stranice
-    text = soup.get_text(" ", strip=True)
-    price = normalize_price(text)
+    # CIJENA - traži u specifičnim elementima (sale price prvo, zatim regular price)
+    price = None
+    
+    # 1. Pokušaj pronađi aktivnu/sale cijenu (obično je u <span class="price"> ili slično)
+    price_elem = soup.find("span", class_=re.compile(r"(price|sale|current)"))
+    if price_elem:
+        price = normalize_price(price_elem.get_text())
+    
+    # 2. Ako nije pronađena, traži u meta tag-u (Open Graph)
+    if not price:
+        meta_price = soup.find("meta", property="product:price:amount")
+        if meta_price:
+            price = normalize_price(meta_price.get("content", ""))
+    
+    # 3. Ako nije pronađena, traži prvu cijenu na stranici
+    if not price:
+        text = soup.get_text(" ", strip=True)
+        price = normalize_price(text)
 
     # slika - prvo pokušaj og:image, zatim product image, zatim bilo koja slika
     img_url = None
