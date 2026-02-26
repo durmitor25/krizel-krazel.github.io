@@ -38,18 +38,35 @@ def fetch_product(item):
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    # CIJENA - traži og:price:amount meta tag (točna aktivna cijena)
+    # CIJENA - traži hdt-price element (aktivna cijena)
     price = None
-    meta_price = soup.find("meta", property="og:price:amount")
-    if meta_price:
-        price = normalize_price(meta_price.get("content", ""))
+    price_elem = soup.find("hdt-price", class_="hdt-price")
+    if price_elem:
+        price_text = price_elem.get_text(strip=True)
+        if price_text:
+            price = normalize_price(price_text)
     
-    # STARA CIJENA - traži hdt-compare-at-price element (precrtana cijena)
+    # Ako nije pronađena, pokušaj og:price:amount meta tag
+    if not price:
+        meta_price = soup.find("meta", property="og:price:amount")
+        if meta_price:
+            price = normalize_price(meta_price.get("content", ""))
+    
+    # STARA CIJENA - traži hdt-compare-at-price i onda hdt-money span
     old_price = None
     compare_elem = soup.find("hdt-compare-at-price")
+    print(f"DEBUG {item['name']}: compare_elem={'PRONAĐEN' if compare_elem else 'NIJE PRONAĐEN'}")
     if compare_elem:
-        old_price_text = compare_elem.get_text()
-        old_price = normalize_price(old_price_text)
+        # Traži hdt-money span koji sadrži cijenu
+        money_elem = compare_elem.find("span", class_="hdt-money")
+        print(f"DEBUG {item['name']}: money_elem={'PRONAĐEN' if money_elem else 'NIJE PRONAĐEN'}")
+        if money_elem:
+            old_price_text = money_elem.get_text(strip=True)
+            print(f"DEBUG {item['name']}: old_price_text='{old_price_text}'")
+            # Ignoriraj prazne stringove
+            if old_price_text:
+                old_price = normalize_price(old_price_text)
+                print(f"DEBUG {item['name']}: old_price={old_price}")
     
     # Ako je old_price ista kao price, nema popusta - postavi na null
     if old_price and price and old_price == price:
@@ -151,18 +168,21 @@ def main():
         prev = old_state.get(name)
         current_price = prev["price"] if prev else None
         previous_old_price = prev.get("old_price") if prev else None
-        old_price = previous_old_price
+        
+        # Koristi scraped_old_price ako postoji, inače prethodnu
+        old_price = scraped_old_price if scraped_old_price else previous_old_price
 
         if current_price is not None and new_price is not None and current_price != new_price:
             print(f"Cijena se promijenila za {name}: {current_price} -> {new_price}")
             send_email(name, url, current_price, new_price)
             old_price = current_price
-        elif current_price is None and scraped_old_price:
-            # Prvi put - koristi old_price sa stranice
+        elif current_price is None and scraped_old_price and scraped_old_price != new_price:
+            # Prvi put - koristi old_price sa stranice SAMO ako je različita od nove
             old_price = scraped_old_price
             print(f"Prvi put - {name}: nova {new_price} €, stara {scraped_old_price} €")
         else:
             print(f"Nema promjene za {name}: {new_price} €")
+            # Zadržи old_price kako je postavljena na liniji 173 (ne resetuj na None!)
 
         new_state[name] = {
             "price": new_price,
