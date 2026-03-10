@@ -131,9 +131,13 @@ def send_email(name: str, url: str, old_price: float | None, new_price: float):
     )
     msg.set_content(body)
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-        smtp.login(user, pwd)
-        smtp.send_message(msg)
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(user, pwd)
+            smtp.send_message(msg)
+        print(f"✓ Email poslан za {name}")
+    except Exception as e:
+        print(f"✗ Email greška za {name}: {e}")
 
 
 def load_state():
