@@ -1,0 +1,60 @@
+# Definicija izvora (sajtova) za praćenje cijena
+sources:
+  bplatz.de:
+    name: "BEAUTY PLATZ"
+    price_selectors:
+      - type: "tag"
+        tag: "hdt-price"
+        class: "hdt-price"
+      - type: "meta"
+        property: "og:price:amount"
+    old_price_selectors:
+      - type: "tag"
+        tag: "hdt-compare-at-price"
+        class: "hdt-compare-at-price"
+        search_in: "hdt-money"
+    image_selectors:
+      - type: "meta"
+        property: "og:image"
+      - type: "tag"
+        tag: "img"
+        class_contains: "product"
+      - type: "tag"
+        tag: "img"
+        attr: "data-src"
+      - type: "tag"
+        tag: "img"
+        attr: "src"
+
+  parfum-zentrum.de:
+    name: "Parfum Zentrum"
+    price_selectors:
+      - type: "meta"
+        property: "og:price:amount"
+      - type: "tag"
+        tag: "span"
+        class: "price"
+      - type: "span_with_euro"
+        description: "Bilo koji span sa € simbolom"
+    old_price_selectors:
+      - type: "tag"
+        tag: "del"
+        class: "price"
+    image_selectors:
+      - type: "meta"
+        property: "og:image"
+      - type: "tag"
+        tag: "img"
+        class_contains: "product"
+      - type: "tag"
+        tag: "img"
+        attr: "src"
+
+  # Dodaj nove izvore ovdje
+  # primjer:
+  # example.com:
+  #   name: "Example"
+  #   price_selectors:
+  #     - type: "tag"
+  #       tag: "span"
+  #       class: "price"
