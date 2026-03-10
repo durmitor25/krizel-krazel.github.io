@@ -64,9 +64,10 @@ def fetch_product(item):
     if not price:
         for span in soup.find_all("span"):
             text = span.get_text(strip=True)
-            if "€" in text:
-                price = normalize_price(text)
-                if price:
+            if "€" in text and len(text) < 20:  # Izbjegni duge tekstove
+                temp_price = normalize_price(text)
+                if temp_price and 1 < temp_price < 500:  # Razumna cijena
+                    price = temp_price
                     break
     
     # STARA CIJENA - traži hdt-compare-at-price i onda hdt-money span
