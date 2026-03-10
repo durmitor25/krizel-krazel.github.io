@@ -15,12 +15,24 @@
     "price": 22.9,
     "url": "https://bplatz.de/products/fragrance-world-liquid-brun-eau-de-parfum-100ml?variant=54015243419916",
     "image": "https://bplatz.de/cdn/shop/files/Fragrance_World_Liquid_Brun_Eau_de_Parfum_100ml_-1.webp?v=1767527897",
-    "old_price": 23.89
+    "old_price": 42.0
   },
-  "Jean Lowe Immortel Eau de Parfum": {
+  "Jean Lowe Immortel Eau de Parfum 100 ml": {
     "price": 21.98,
     "url": "https://bplatz.de/products/maison-alhambra-perfume-jean-lowe-immortal-eau-de-parfum-100ml",
     "image": "https://bplatz.de/cdn/shop/files/Maison_Alhambra_Perfume_Jean_Lowe_Immortel_Eau_de_Parfum_100ml_1.webp?v=1756820452",
+    "old_price": null
+  },
+  "Jean Lowe Immortel Eau de Parfum 30 ml": {
+    "price": 9.48,
+    "url": "https://bplatz.de/products/jean-lowe-immortel-eau-de-parfum-30ml?variant=54543245574412",
+    "image": "https://bplatz.de/cdn/shop/files/Maison_Alhambra_Jean_Lowe_Immortel_Eau_de_Parfum_30_ml.png?v=1762350562",
+    "old_price": null
+  },
+  "Rifaaqat Adorn Eau De Parfum 85 ml Unisex": {
+    "price": null,
+    "url": "https://www.parfum-zentrum.de/paris-corner-rifaaqat-adorn-eau-de-parfum-85-ml-unisex_z1009648/",
+    "image": "https://www.parfum-zentrum.de/data/tmp/108/5/385865_108.jpg?1764847167_1",
     "old_price": null
   }
 }
