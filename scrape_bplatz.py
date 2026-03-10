@@ -38,19 +38,36 @@ def fetch_product(item):
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    # CIJENA - traži hdt-price element (aktivna cijena)
+    # CIJENA - pokušaj više opcija
     price = None
+    
+    # 1. Pokušaj hdt-price (bplatz.de)
     price_elem = soup.find("hdt-price", class_="hdt-price")
     if price_elem:
         price_text = price_elem.get_text(strip=True)
         if price_text:
             price = normalize_price(price_text)
     
-    # Ako nije pronađena, pokušaj og:price:amount meta tag
+    # 2. Pokušaj og:price:amount meta tag
     if not price:
         meta_price = soup.find("meta", property="og:price:amount")
         if meta_price:
             price = normalize_price(meta_price.get("content", ""))
+    
+    # 3. Pokušaj sa "price" klasom (parfum-zentrum.de)
+    if not price:
+        price_span = soup.find("span", class_="price")
+        if price_span:
+            price = normalize_price(price_span.get_text(strip=True))
+    
+    # 4. Pokušaj bilo koji span sa € simbolom
+    if not price:
+        for span in soup.find_all("span"):
+            text = span.get_text(strip=True)
+            if "€" in text:
+                price = normalize_price(text)
+                if price:
+                    break
     
     # STARA CIJENA - traži hdt-compare-at-price i onda hdt-money span
     old_price = None
@@ -68,7 +85,7 @@ def fetch_product(item):
     if old_price and price and old_price == price:
         old_price = None
 
-    # slika - prvo pokušaj og:image, zatim product image, zatim bilo koja slika
+    # SLIKA - pokušaj više opcija
     img_url = None
     
     # 1. Pokušaj og:image (Shopify meta tag)
@@ -76,17 +93,23 @@ def fetch_product(item):
     if img_tag and img_tag.get("content"):
         img_url = img_tag["content"]
     
-    # 2. Ako nije pronađena, pokušaj direktno img tag sa src
+    # 2. Pokušaj product image klasu
     if not img_url:
-        img = soup.find("img")
-        if img and img.get("src"):
-            img_url = img["src"]
+        product_img = soup.find("img", class_=lambda x: x and "product" in x.lower())
+        if product_img and product_img.get("src"):
+            img_url = product_img["src"]
     
     # 3. Pokušaj data-src (lazy loading slike)
     if not img_url:
         img = soup.find("img", {"data-src": True})
         if img and img.get("data-src"):
             img_url = img["data-src"]
+    
+    # 4. Pokušaj bilo koju sliku sa src
+    if not img_url:
+        img = soup.find("img", {"src": True})
+        if img and img.get("src"):
+            img_url = img["src"]
     
     # Normalizuj URL slike - dinamički hvata domenu
     if img_url:
