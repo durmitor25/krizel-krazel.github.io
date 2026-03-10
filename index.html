@@ -232,19 +232,19 @@
 
         .parfem-card h2 {
             font-family: 'Raleway', sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: var(--primary);
             margin-bottom: 10px;
             font-weight: 400;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
             line-height: 1.3;
         }
 
         @media (max-width: 768px) {
             .parfem-card h2 {
-                font-size: 0.8rem;
-                letter-spacing: 0.3px;
+                font-size: 0.7rem;
+                letter-spacing: 0.2px;
             }
         }
 
@@ -398,9 +398,9 @@
 
                     let imageHTML = '';
                     if (item.image) {
-                        imageHTML = `<div class="image-container"><img src="${item.image}" alt="${name}" loading="lazy"></div>`;
+                        imageHTML = `<div class="image-container"><img src="${item.image}" alt="${name}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML+='<p class=\"no-image\">❌ Slika nije dostupna</p>'"></div>`;
                     } else {
-                        imageHTML = '<div class="image-container"><p class="no-image">Nema slike</p></div>';
+                        imageHTML = '<div class="image-container"><p class="no-image">❌ Nema slike</p></div>';
                     }
 
                     let cijenaHTML = `<div class="price-value">${item.price ? item.price + " €" : "—"}</div>`;

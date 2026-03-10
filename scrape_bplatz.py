@@ -85,31 +85,47 @@ def fetch_product(item):
     if old_price and price and old_price == price:
         old_price = None
 
-    # SLIKA - pokušaj više opcija
+    # SLIKA - pokušaj više opcija, ali izbjegni watermark/logo slike
     img_url = None
+    
+    def is_valid_image(url):
+        """Provjeri da li je slika valida (ne watermark/logo)"""
+        if not url:
+            return False
+        url_lower = url.lower()
+        # Izbjegni watermark, logo, icon slike
+        return not any(x in url_lower for x in ["watermark", "logo", "icon", "placeholder"])
     
     # 1. Pokušaj og:image (Shopify meta tag)
     img_tag = soup.find("meta", property="og:image")
     if img_tag and img_tag.get("content"):
-        img_url = img_tag["content"]
+        potential_url = img_tag["content"]
+        if is_valid_image(potential_url):
+            img_url = potential_url
     
     # 2. Pokušaj product image klasu
     if not img_url:
-        product_img = soup.find("img", class_=lambda x: x and "product" in x.lower())
-        if product_img and product_img.get("src"):
-            img_url = product_img["src"]
+        for img in soup.find_all("img", class_=lambda x: x and "product" in x.lower()):
+            potential_url = img.get("src")
+            if is_valid_image(potential_url):
+                img_url = potential_url
+                break
     
     # 3. Pokušaj data-src (lazy loading slike)
     if not img_url:
         img = soup.find("img", {"data-src": True})
-        if img and img.get("data-src"):
-            img_url = img["data-src"]
+        if img:
+            potential_url = img.get("data-src")
+            if is_valid_image(potential_url):
+                img_url = potential_url
     
-    # 4. Pokušaj bilo koju sliku sa src
+    # 4. Pokušaj bilo koju sliku sa src (ali prvo većine)
     if not img_url:
-        img = soup.find("img", {"src": True})
-        if img and img.get("src"):
-            img_url = img["src"]
+        for img in soup.find_all("img", {"src": True}):
+            potential_url = img.get("src")
+            if is_valid_image(potential_url) and potential_url.startswith(("http", "//")):
+                img_url = potential_url
+                break
     
     # Normalizuj URL slike - dinamički hvata domenu
     if img_url:
