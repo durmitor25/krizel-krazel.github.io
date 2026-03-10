@@ -10,6 +10,17 @@ import requests
 from bs4 import BeautifulSoup
 import yaml
 
+# Selenium import - opcionalan
+try:
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.chrome.options import Options
+    SELENIUM_AVAILABLE = True
+except ImportError:
+    SELENIUM_AVAILABLE = False
+
 STATE_FILE = Path("prices.json")
 WATCH_FILE = Path("watch.yml")
 SOURCES_FILE = Path("sources.yml")
@@ -27,7 +38,35 @@ def load_sources():
     return cfg.get("sources", {})
 
 
-def get_source_config(url, sources_config):
+def fetch_with_selenium(url, timeout=10):
+    """Uzmi HTML sa JavaScript sajta koristeći Selenium"""
+    if not SELENIUM_AVAILABLE:
+        print(f"❌ Selenium nije instaliran! Instaliraj: pip install selenium")
+        return None
+    
+    try:
+        options = Options()
+        options.add_argument("--headless")  # Bez GUI
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        
+        driver = webdriver.Chrome(options=options)
+        driver.get(url)
+        
+        # Čekaj da se slike učitaju
+        try:
+            WebDriverWait(driver, timeout).until(
+                EC.presence_of_all_elements_located((By.TAG_NAME, "img"))
+            )
+        except:
+            pass  # Timeout je OK, nastavi sa onim što ima
+        
+        html = driver.page_source
+        driver.quit()
+        return html
+    except Exception as e:
+        print(f"❌ Selenium greška za {url}: {e}")
+        return None
     """Pronađi konfiguraciju izvora za dati URL"""
     parsed = urlparse(url)
     domain = parsed.netloc.lower()
@@ -106,7 +145,7 @@ def extract_price(soup, selectors, item_name=""):
     return price
 
 
-def extract_image(soup, selectors, url):
+def extract_image(soup, selectors, url, debug=False):
     """Ekstrakuj sliku prema definiranim selectorima"""
     img_url = None
     
@@ -120,34 +159,48 @@ def extract_image(soup, selectors, url):
     for selector in selectors:
         selector_type = selector.get("type", "").lower()
         
+        if debug:
+            print(f"  Pokušavam: {selector_type}")
+        
         if selector_type == "meta":
             prop = selector.get("property")
             elem = soup.find("meta", property=prop)
             if elem and elem.get("content"):
                 potential_url = elem["content"]
                 if is_valid_image(potential_url):
+                    if debug:
+                        print(f"    ✓ Pronađena: {potential_url}")
                     img_url = potential_url
                     break
         
         elif selector_type == "tag":
             tag = selector.get("tag")
+            class_name = selector.get("class")
             class_contains = selector.get("class_contains")
             attr = selector.get("attr")
             
-            if class_contains:
-                imgs = soup.find_all(tag, class_=lambda x: x and class_contains.lower() in x.lower())
+            if class_name:
+                elems = soup.find_all(tag, class_=class_name)
+            elif class_contains:
+                elems = soup.find_all(tag, class_=lambda x: x and class_contains.lower() in x.lower())
             else:
-                imgs = soup.find_all(tag)
+                elems = soup.find_all(tag)
             
-            for img in imgs:
-                if attr and attr == "data-src":
-                    potential_url = img.get("data-src")
-                elif attr and attr == "src":
-                    potential_url = img.get("src")
+            if debug:
+                print(f"    Pronađeno {len(elems)} elementa")
+            
+            for elem in elems:
+                if attr:
+                    potential_url = elem.get(attr)
                 else:
-                    potential_url = img.get("src") or img.get("data-src")
+                    potential_url = elem.get("src") or elem.get("data-src") or elem.get("href")
+                
+                if potential_url and debug:
+                    print(f"      Pokušavam: {potential_url[:80]}")
                 
                 if is_valid_image(potential_url):
+                    if debug:
+                        print(f"    ✓ Pronađena: {potential_url[:80]}")
                     img_url = potential_url
                     break
         
@@ -172,14 +225,28 @@ def fetch_product(item, sources_config):
     """Uzmi proizvod sa sajta koristeći konfiguraciju izvora"""
     url = item["url"]
     
-    try:
-        resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
-        resp.raise_for_status()
-    except Exception as e:
-        print(f"Greška pri učitavanju {url}: {e}")
-        return None
+    # Debug mode za parfum-zentrum.de
+    debug = "parfum-zentrum" in url.lower()
+    use_selenium = "parfum-zentrum" in url.lower()  # Koristi Selenium za ovaj sajt
     
-    soup = BeautifulSoup(resp.text, "html.parser")
+    html = None
+    
+    # Pokušaj sa Selenium za JavaScript sajte
+    if use_selenium and SELENIUM_AVAILABLE:
+        print(f"🌐 Selenium: {item['name']}")
+        html = fetch_with_selenium(url)
+    
+    # Pokušaj sa regular requests ako Selenium nije dostupan ili nije potreban
+    if not html:
+        try:
+            resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            resp.raise_for_status()
+            html = resp.text
+        except Exception as e:
+            print(f"❌ Greška pri učitavanju {url}: {e}")
+            return None
+    
+    soup = BeautifulSoup(html, "html.parser")
     source_config = get_source_config(url, sources_config)
     
     # Ekstrakuj cijenu
@@ -197,7 +264,9 @@ def fetch_product(item, sources_config):
     
     # Ekstrakuj sliku
     image_selectors = source_config.get("image_selectors", [])
-    img_url = extract_image(soup, image_selectors, url)
+    if debug:
+        print(f"\n🔍 DEBUG: {item['name']}")
+    img_url = extract_image(soup, image_selectors, url, debug=debug)
     
     return {
         "name": item["name"],
