@@ -55,25 +55,18 @@ def fetch_product(item):
     # STARA CIJENA - traži hdt-compare-at-price i onda hdt-money span
     old_price = None
     compare_elem = soup.find("hdt-compare-at-price")
-    print(f"DEBUG {item['name']}: compare_elem={'PRONAĐEN' if compare_elem else 'NIJE PRONAĐEN'}")
     if compare_elem:
         # Traži hdt-money span koji sadrži cijenu
         money_elem = compare_elem.find("span", class_="hdt-money")
-        print(f"DEBUG {item['name']}: money_elem={'PRONAĐEN' if money_elem else 'NIJE PRONAĐEN'}")
         if money_elem:
             old_price_text = money_elem.get_text(strip=True)
-            print(f"DEBUG {item['name']}: old_price_text='{old_price_text}'")
             # Ignoriraj prazne stringove
             if old_price_text:
                 old_price = normalize_price(old_price_text)
-                print(f"DEBUG {item['name']}: old_price={old_price}")
     
     # Ako je old_price ista kao price, nema popusta - postavi na null
     if old_price and price and old_price == price:
         old_price = None
-    
-    # Ako nema compare-at-price ali meta tag postoji, znači da nema popusta
-    # old_price ostaje None
 
     # slika - prvo pokušaj og:image, zatim product image, zatim bilo koja slika
     img_url = None
@@ -113,7 +106,7 @@ def fetch_product(item):
         "url": url,
         "price": price,
         "image": img_url,
-        "old_price": old_price,  # Spremi staru cijenu ako postoji na stranici
+        "old_price": old_price,
     }
 
 
@@ -155,7 +148,7 @@ def save_state(state):
 
 def main():
     items = load_items()
-    old_state = load_state()  # { name: {price, url, image, old_price} }
+    old_state = load_state()
     new_state = {}
 
     for item in items:
@@ -163,7 +156,7 @@ def main():
         name = prod["name"]
         new_price = prod["price"]
         url = prod["url"]
-        scraped_old_price = prod.get("old_price")  # Stara cijena sa stranice
+        scraped_old_price = prod.get("old_price")
 
         prev = old_state.get(name)
         current_price = prev["price"] if prev else None
@@ -182,7 +175,6 @@ def main():
             print(f"Prvi put - {name}: nova {new_price} €, stara {scraped_old_price} €")
         else:
             print(f"Nema promjene za {name}: {new_price} €")
-            # Zadržи old_price kako je postavljena na liniji 173 (ne resetuj na None!)
 
         new_state[name] = {
             "price": new_price,
