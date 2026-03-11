@@ -67,6 +67,9 @@ def fetch_with_selenium(url, timeout=10):
     except Exception as e:
         print(f"❌ Selenium greška za {url}: {e}")
         return None
+
+
+def get_source_config(url, sources_config):
     """Pronađi konfiguraciju izvora za dati URL"""
     parsed = urlparse(url)
     domain = parsed.netloc.lower()
@@ -96,12 +99,15 @@ def normalize_price(text: str) -> float | None:
     return None
 
 
-def extract_price(soup, selectors, item_name=""):
+def extract_price(soup, selectors, item_name="", debug=False):
     """Ekstrakuj cijenu prema definiranim selectorima"""
     price = None
     
     for selector in selectors:
         selector_type = selector.get("type", "").lower()
+        
+        if debug:
+            print(f"  Price pokušaj: {selector_type}")
         
         if selector_type == "tag":
             tag = selector.get("tag")
@@ -117,26 +123,65 @@ def extract_price(soup, selectors, item_name=""):
             
             if elem:
                 price_text = elem.get_text(strip=True)
+                if debug:
+                    print(f"    Pronađeno: {price_text[:50]}")
                 if price_text:
                     price = normalize_price(price_text)
                     if price:
+                        if debug:
+                            print(f"    ✓ Cijena: {price}")
                         break
+        
+        elif selector_type == "css_selector":
+            # CSS selector support
+            css = selector.get("selector")
+            selectors_list = [s.strip() for s in css.split(",")]
+            
+            for css_sel in selectors_list:
+                try:
+                    elem = soup.select_one(css_sel)
+                    if elem:
+                        price_text = elem.get_text(strip=True)
+                        if debug:
+                            print(f"    CSS '{css_sel}': {price_text[:50]}")
+                        if price_text:
+                            price = normalize_price(price_text)
+                            if price:
+                                if debug:
+                                    print(f"    ✓ Cijena: {price}")
+                                break
+                except:
+                    pass
+            
+            if price:
+                break
         
         elif selector_type == "meta":
             prop = selector.get("property")
             elem = soup.find("meta", property=prop)
             if elem and elem.get("content"):
+                if debug:
+                    print(f"    Meta: {elem.get('content')[:50]}")
                 price = normalize_price(elem.get("content", ""))
                 if price:
+                    if debug:
+                        print(f"    ✓ Cijena: {price}")
                     break
         
         elif selector_type == "span_with_euro":
-            # Pokušaj bilo koji span sa € simbolom
-            for span in soup.find_all("span"):
-                text = span.get_text(strip=True)
-                if "€" in text and len(text) < 20:
+            # Pokušaj bilo koji element sa € simbolom
+            if debug:
+                print(f"    Tražim sve € u stranici...")
+            
+            for elem in soup.find_all():
+                text = elem.get_text(strip=True)
+                if "€" in text and len(text) < 50 and len(text) > 2:
+                    if debug:
+                        print(f"      Pronađeno: '{text}'")
                     temp_price = normalize_price(text)
                     if temp_price and 1 < temp_price < 500:
+                        if debug:
+                            print(f"    ✓ Cijena: {temp_price}")
                         price = temp_price
                         break
             if price:
@@ -251,7 +296,7 @@ def fetch_product(item, sources_config):
     
     # Ekstrakuj cijenu
     price_selectors = source_config.get("price_selectors", [])
-    price = extract_price(soup, price_selectors, item.get("name", ""))
+    price = extract_price(soup, price_selectors, item.get("name", ""), debug=debug)
     
     # Ekstrakuj staru cijenu
     old_price = None
