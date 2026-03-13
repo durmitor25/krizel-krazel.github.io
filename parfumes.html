@@ -1,0 +1,250 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.container { padding: 1.5rem 0; }
+h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.25rem; }
+.subtitle { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 1.5rem; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+.filter-btn { padding: 5px 14px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: 20px; background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.filter-btn:hover, .filter-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; transition: border-color 0.15s; }
+.card:hover { border-color: var(--color-border-primary); }
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.parfem-name { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.original { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+.tier-badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+.tier-niche { background: #EEEDFE; color: #3C3489; }
+.tier-mainstream { background: #E1F5EE; color: #085041; }
+.tier-clone { background: #FAEEDA; color: #633806; }
+.divider { height: 0.5px; background: var(--color-border-tertiary); margin: 10px 0; }
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.meta-item { }
+.meta-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+.meta-value { font-size: 13px; color: var(--color-text-primary); font-weight: 500; }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.tag { font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); }
+.tag.office { background: #E6F1FB; color: #185FA5; border-color: #B5D4F4; }
+.tag.date { background: #FBEAF0; color: #72243E; border-color: #F4C0D1; }
+.tag.night { background: #EEEDFE; color: #3C3489; border-color: #CECBF6; }
+.tag.casual { background: #EAF3DE; color: #3B6D11; border-color: #C0DD97; }
+.tag.special { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+.layering { font-size: 12px; color: var(--color-text-secondary); }
+.layering span { font-weight: 500; color: var(--color-text-primary); }
+.proj-bar { display: flex; gap: 3px; align-items: center; margin-top: 3px; }
+.proj-dot { width: 8px; height: 8px; border-radius: 50%; }
+.proj-dot.filled { background: var(--color-text-primary); }
+.proj-dot.empty { background: var(--color-border-tertiary); }
+.tip { font-size: 12px; color: var(--color-text-secondary); margin-top: 8px; padding-top: 8px; border-top: 0.5px solid var(--color-border-tertiary); font-style: italic; }
+.hidden { display: none; }
+</style>
+
+<div class="container">
+  <h1>Moja kolekcija parfema</h1>
+  <p class="subtitle">7 mirisa &bull; Klikni filter da suzis prikaz</p>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="filter('all', this)">Svi</button>
+    <button class="filter-btn" onclick="filter('office', this)">Kancelarija</button>
+    <button class="filter-btn" onclick="filter('date', this)">Dejt</button>
+    <button class="filter-btn" onclick="filter('night', this)">Izlazak</button>
+    <button class="filter-btn" onclick="filter('casual', this)">Casual</button>
+    <button class="filter-btn" onclick="filter('special', this)">Posebna prigoda</button>
+  </div>
+
+  <div class="grid" id="grid">
+
+    <div class="card" data-tags="office special">
+      <div class="card-header">
+        <div>
+          <div class="parfem-name">Bois Impérial</div>
+          <div class="original">Nišni — originalni miris</div>
+        </div>
+        <span class="tier-badge tier-niche">Nišni</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="meta-label">Trajanje</div><div class="meta-value">10–12h+</div></div>
+        <div class="meta-item"><div class="meta-label">Sezona</div><div class="meta-value">Jesen / Zima / Proljeće</div></div>
+        <div class="meta-item"><div class="meta-label">Projekcija</div>
+          <div class="proj-bar"><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div></div>
+        </div>
+        <div class="meta-item"><div class="meta-label">Layering</div><div class="meta-value">Balea Med</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="tags">
+        <span class="tag office">Kancelarija</span>
+        <span class="tag special">Signature</span>
+      </div>
+      <div class="layering">Vibe: <span>Mineralno, hladno, distancirano</span></div>
+      <div class="tip">Max 2 prskanja — kolege će te osjetiti u drugoj sobi</div>
+    </div>
+
+    <div class="card" data-tags="night">
+      <div class="card-header">
+        <div>
+          <div class="parfem-name">Lattafa Asad</div>
+          <div class="original">Klon / inspiracija</div>
+        </div>
+        <span class="tier-badge tier-clone">Klon</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="meta-label">Trajanje</div><div class="meta-value">8–10h</div></div>
+        <div class="meta-item"><div class="meta-label">Sezona</div><div class="meta-value">Zima / Jesen</div></div>
+        <div class="meta-item"><div class="meta-label">Projekcija</div>
+          <div class="proj-bar"><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot empty"></div></div>
+        </div>
+        <div class="meta-item"><div class="meta-label">Layering</div><div class="meta-value">Vazelin</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="tags">
+        <span class="tag night">Izlazak</span>
+        <span class="tag night">Klub</span>
+      </div>
+      <div class="layering">Vibe: <span>Toplo, životinjsko, noćno</span></div>
+      <div class="tip">Treba mu toplina tijela i gužve — idealan za klub</div>
+    </div>
+
+    <div class="card" data-tags="office">
+      <div class="card-header">
+        <div>
+          <div class="parfem-name">Prada Amber PH</div>
+          <div class="original">Mainstream premium</div>
+        </div>
+        <span class="tier-badge tier-mainstream">Mainstream</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="meta-label">Trajanje</div><div class="meta-value">5–7h</div></div>
+        <div class="meta-item"><div class="meta-label">Sezona</div><div class="meta-value">Proljeće / Ljeto</div></div>
+        <div class="meta-item"><div class="meta-label">Projekcija</div>
+          <div class="proj-bar"><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot empty"></div><div class="proj-dot empty"></div></div>
+        </div>
+        <div class="meta-item"><div class="meta-label">Layering</div><div class="meta-value">Balea Med</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="tags">
+        <span class="tag office">Kancelarija</span>
+        <span class="tag office">Sastanci</span>
+      </div>
+      <div class="layering">Vibe: <span>Čisto, profesionalno, amber</span></div>
+      <div class="tip">Pazi na doziranje ljeti — na toploj koži pojačava se slatkoća</div>
+    </div>
+
+    <div class="card" data-tags="casual office">
+      <div class="card-header">
+        <div>
+          <div class="parfem-name">Montblanc Explorer</div>
+          <div class="original">Mainstream premium</div>
+        </div>
+        <span class="tier-badge tier-mainstream">Mainstream</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="meta-label">Trajanje</div><div class="meta-value">6–8h</div></div>
+        <div class="meta-item"><div class="meta-label">Sezona</div><div class="meta-value">Sve (osim mraza)</div></div>
+        <div class="meta-item"><div class="meta-label">Projekcija</div>
+          <div class="proj-bar"><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot empty"></div><div class="proj-dot empty"></div></div>
+        </div>
+        <div class="meta-item"><div class="meta-label">Layering</div><div class="meta-value">Med + Vazelin</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="tags">
+        <span class="tag casual">Svaki dan</span>
+        <span class="tag office">Posao</span>
+        <span class="tag casual">Kafa</span>
+      </div>
+      <div class="layering">Vibe: <span>Svjež, drveni, univerzalan</span></div>
+      <div class="tip">Sigurni izbor — ide uz trenerku i odijelo podjednako</div>
+    </div>
+
+    <div class="card" data-tags="date">
+      <div class="card-header">
+        <div>
+          <div class="parfem-name">Guerlain L'Homme Idéal</div>
+          <div class="original">Mainstream premium</div>
+        </div>
+        <span class="tier-badge tier-mainstream">Mainstream</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="meta-label">Trajanje</div><div class="meta-value">7–9h</div></div>
+        <div class="meta-item"><div class="meta-label">Sezona</div><div class="meta-value">Jesen / Zima</div></div>
+        <div class="meta-item"><div class="meta-label">Projekcija</div>
+          <div class="proj-bar"><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot empty"></div><div class="proj-dot empty"></div></div>
+        </div>
+        <div class="meta-item"><div class="meta-label">Layering</div><div class="meta-value">Balea Med</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="tags">
+        <span class="tag date">Dejt</span>
+        <span class="tag date">Večera</span>
+      </div>
+      <div class="layering">Vibe: <span>Badem, trešnja, toplo, elegantno</span></div>
+      <div class="tip">Žene ga ocjenjuju kao jedan od najprivlačnijih muških mirisa</div>
+    </div>
+
+    <div class="card" data-tags="special date">
+      <div class="card-header">
+        <div>
+          <div class="parfem-name">Paris Corner Celestial</div>
+          <div class="original">Klon — Ganymede (Marc-Antoine Barrois)</div>
+        </div>
+        <span class="tier-badge tier-clone">Klon</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="meta-label">Trajanje</div><div class="meta-value">8–10h</div></div>
+        <div class="meta-item"><div class="meta-label">Sezona</div><div class="meta-value">Proljeće / Ljeto / Jesen</div></div>
+        <div class="meta-item"><div class="meta-label">Projekcija</div>
+          <div class="proj-bar"><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot empty"></div></div>
+        </div>
+        <div class="meta-item"><div class="meta-label">Layering</div><div class="meta-value">Balea Med</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="tags">
+        <span class="tag special">Posebna prigoda</span>
+        <span class="tag date">Dejt</span>
+      </div>
+      <div class="layering">Vibe: <span>Futuristički, mineralno, misteriozno</span></div>
+      <div class="tip">Ne miješaj s Bois Impérial — oba su dominantna i "posvađat" će se na koži</div>
+    </div>
+
+    <div class="card" data-tags="casual date">
+      <div class="card-header">
+        <div>
+          <div class="parfem-name">Emper Stallion 53</div>
+          <div class="original">Klon — Santal 33 (Le Labo)</div>
+        </div>
+        <span class="tier-badge tier-clone">Klon</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="meta-label">Trajanje</div><div class="meta-value">7–9h</div></div>
+        <div class="meta-item"><div class="meta-label">Sezona</div><div class="meta-value">Sve sezone</div></div>
+        <div class="meta-item"><div class="meta-label">Projekcija</div>
+          <div class="proj-bar"><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot filled"></div><div class="proj-dot empty"></div><div class="proj-dot empty"></div></div>
+        </div>
+        <div class="meta-item"><div class="meta-label">Layering</div><div class="meta-value">Vazelin</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="tags">
+        <span class="tag casual">Casual</span>
+        <span class="tag date">Dejt</span>
+        <span class="tag special">Signature</span>
+      </div>
+      <div class="layering">Vibe: <span>Suha sandalovina, koža, unisex, memorabilno</span></div>
+      <div class="tip">Svako te pita šta nosiš — jedan od najprepoznatljivijih mirisa</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function filter(tag, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.card').forEach(card => {
+    if (tag === 'all' || card.dataset.tags.includes(tag)) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+}
+</script>

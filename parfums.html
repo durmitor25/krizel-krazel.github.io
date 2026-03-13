@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moja kolekcija parfema</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #0f0f0f; color: #f0f0f0; min-height: 100vh; }
+
+  .header { padding: 2rem 2rem 1rem; border-bottom: 1px solid #222; }
+  .header h1 { font-size: 26px; font-weight: 600; color: #fff; }
+  .header p { font-size: 14px; color: #888; margin-top: 6px; }
+
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; padding: 1rem 2rem; border-bottom: 1px solid #222; }
+  .filter-btn {
+    padding: 6px 16px; border-radius: 20px;
+    border: 1px solid #333; background: transparent;
+    color: #888; font-size: 13px; cursor: pointer; transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: #555; color: #ccc; }
+  .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #555; font-weight: 500; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; padding: 1.5rem 2rem; }
+
+  .card {
+    background: #1a1a1a; border: 1px solid #2a2a2a;
+    border-radius: 14px; padding: 1.25rem; transition: border-color 0.15s;
+  }
+  .card:hover { border-color: #444; }
+  .card.hidden { display: none; }
+
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .card-name { font-size: 16px; font-weight: 600; color: #fff; }
+  .clone-of { font-size: 12px; color: #666; margin-top: 3px; }
+  .wishlist-badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: #0f2e1a; color: #4ade80; margin-top: 4px; display: inline-block; }
+  .klon-badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: #1a1f3a; color: #818cf8; white-space: nowrap; }
+
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+  .tag { font-size: 11px; padding: 3px 9px; border-radius: 20px; }
+  .tag.prigoda { background: #2a1a0a; color: #fb923c; }
+  .tag.vibe { background: #1a0a2a; color: #c084fc; }
+
+  .rows { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+  .row { display: flex; align-items: center; justify-content: space-between; }
+  .row-label { font-size: 12px; color: #666; }
+  .row-value { font-size: 13px; color: #ccc; font-weight: 500; }
+
+  .dots { display: flex; gap: 3px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.on { background: #818cf8; }
+  .dot.off { background: #2a2a2a; }
+
+  .seasons { display: flex; gap: 4px; flex-wrap: wrap; }
+  .season { font-size: 11px; padding: 2px 8px; border-radius: 8px; background: #222; color: #888; }
+
+  .divider { border: none; border-top: 1px solid #222; margin: 10px 0; }
+  .tip { font-size: 12px; color: #666; line-height: 1.6; }
+  .tip strong { color: #aaa; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Moja kolekcija parfema</h1>
+  <p>7 mirisa · filtriraj po prigodi · klonovi označeni</p>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="filter(this,'sve')">Sve</button>
+  <button class="filter-btn" onclick="filter(this,'kancelarija')">Kancelarija</button>
+  <button class="filter-btn" onclick="filter(this,'dejt')">Dejt</button>
+  <button class="filter-btn" onclick="filter(this,'izlazak')">Izlazak</button>
+  <button class="filter-btn" onclick="filter(this,'casual')">Casual</button>
+  <button class="filter-btn" onclick="filter(this,'posebno')">Posebni događaji</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const data = [
+  {
+    name: "Bois Impérial",
+    klon: false, original: null, wishlist: false,
+    prigode: ["kancelarija","posebno"],
+    trajanje: "10–12h", projekcija: 5,
+    sezone: ["Jesen","Zima","Proljeće"],
+    baza: "Balea Med", vibe: "Signature / Beast mode",
+    tip: "Samo 2 prskanja — kolege će te osjetiti u drugoj sobi. Izbjegavaj ljeto, projekcija u vrućini je prevelika."
+  },
+  {
+    name: "Lattafa Asad",
+    klon: false, original: null, wishlist: false,
+    prigode: ["izlazak"],
+    trajanje: "8–10h", projekcija: 4,
+    sezone: ["Zima","Jesen"],
+    baza: "Vazelin", vibe: "Hladne noći / Klub",
+    tip: "Ovom mirisu treba toplina kluba. Vazelin na vratu osigurava da mirišeš isto u 2 ujutru kao na početku."
+  },
+  {
+    name: "Prada Amber PH",
+    klon: false, original: null, wishlist: false,
+    prigode: ["kancelarija"],
+    trajanje: "5–7h", projekcija: 3,
+    sezone: ["Proljeće","Ljeto"],
+    baza: "Balea Med", vibe: "Kancelarija / Sastanci",
+    tip: "Pazi na doziranje ljeti — slatka/amberna baza na toploj koži postaje iznenađujuće jaka."
+  },
+  {
+    name: "Montblanc Explorer",
+    klon: false, original: null, wishlist: false,
+    prigode: ["kancelarija","casual"],
+    trajanje: "6–8h", projekcija: 3,
+    sezone: ["Sve sezone"],
+    baza: "Med + Vazelin", vibe: "Svaki dan / Svaka prilika",
+    tip: "Ide uz sve — od trenerke do odijela. Siguran izbor kad nisi siguran šta odjenuti."
+  },
+  {
+    name: "Guerlain L'Homme Idéal",
+    klon: false, original: null, wishlist: false,
+    prigode: ["dejt"],
+    trajanje: "7–9h", projekcija: 3,
+    sezone: ["Jesen","Zima"],
+    baza: "Balea Med", vibe: "Dejt / Elegantno / Večera",
+    tip: "Žene ocjenjuju miris badema i trešnje kao jedan od najprivlačnijih. Balea Med drži miris mekanim izbliza."
+  },
+  {
+    name: "Paris Corner Celestial",
+    klon: true, original: "Marc-Antoine Barrois — Ganymede", wishlist: true,
+    prigode: ["posebno","dejt"],
+    trajanje: "8–10h", projekcija: 4,
+    sezone: ["Proljeće","Ljeto","Jesen"],
+    baza: "Balea Med", vibe: "Futuristički / Misteriozno privlačan",
+    tip: "Metalno-mineralni otvor, ledena ljubičica, musk u bazi. Nemoj miješati s Bois Impérialôm isti dan."
+  },
+  {
+    name: "Emper Stallion 53",
+    klon: true, original: "Le Labo — Santal 33", wishlist: true,
+    prigode: ["casual","dejt"],
+    trajanje: "7–9h", projekcija: 3,
+    sezone: ["Jesen","Zima","Proljeće"],
+    baza: "Vazelin", vibe: "Unisex / Kožno / Memorabilno",
+    tip: "Suha sandalovina + kardamom + kožni musk. Svako te pita šta nosiš. Odličan casual i dejt miris."
+  }
+];
+
+function dots(n) {
+  let h = "";
+  for (let i = 1; i <= 5; i++) h += `<div class="dot ${i<=n?'on':'off'}"></div>`;
+  return h;
+}
+
+function render(list) {
+  document.getElementById('grid').innerHTML = list.map(p => `
+    <div class="card" data-prigode="${p.prigode.join(',')}">
+      <div class="card-top">
+        <div>
+          <div class="card-name">${p.name}</div>
+          ${p.klon ? `<div class="clone-of">Klon od: ${p.original}</div>` : ''}
+          ${p.wishlist ? `<span class="wishlist-badge">Original na wishlist-i</span>` : ''}
+        </div>
+        ${p.klon ? `<span class="klon-badge">Klon</span>` : ''}
+      </div>
+      <div class="tags">
+        ${p.prigode.map(pr => `<span class="tag prigoda">${pr.charAt(0).toUpperCase()+pr.slice(1)}</span>`).join('')}
+        <span class="tag vibe">${p.vibe}</span>
+      </div>
+      <div class="rows">
+        <div class="row"><span class="row-label">Trajanje</span><span class="row-value">${p.trajanje}</span></div>
+        <div class="row"><span class="row-label">Projekcija</span><div class="dots">${dots(p.projekcija)}</div></div>
+        <div class="row"><span class="row-label">Layering baza</span><span class="row-value">${p.baza}</span></div>
+        <div class="row">
+          <span class="row-label">Sezone</span>
+          <div class="seasons">${p.sezone.map(s=>`<span class="season">${s}</span>`).join('')}</div>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="tip"><strong>Savjet:</strong> ${p.tip}</div>
+    </div>
+  `).join('');
+}
+
+function filter(btn, tag) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.card').forEach(c => {
+    c.classList.toggle('hidden', tag !== 'sve' && !c.dataset.prigode.includes(tag));
+  });
+}
+
+render(data);
+</script>
+</body>
+</html>
