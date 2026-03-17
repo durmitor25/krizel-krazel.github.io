@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ski Trening Plan — 20 minuta</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --snow: #f0f4f8; --slope: #1a2744; --deep: #0d1829;
+    --accent: #3a8fd4; --accent2: #2dc89a; --warm: #f0a045;
+    --text: #1a2744; --muted: #6b7f99; --border: #d0dce8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', sans-serif; background: var(--snow); color: var(--text); min-height: 100vh; }
+
+  .header { background: var(--deep); color: white; padding: 40px 32px 32px; position: relative; overflow: hidden; }
+  .header::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background:repeating-linear-gradient(-45deg,transparent,transparent 18px,rgba(255,255,255,.018) 18px,rgba(255,255,255,.018) 19px); }
+  .header-inner { position:relative; max-width:680px; margin:0 auto; }
+  .header-tag { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .header-tag::before { content:''; display:inline-block; width:24px; height:2px; background:var(--accent); }
+  h1 { font-family:'Barlow Condensed',sans-serif; font-size:clamp(36px,7vw,56px); font-weight:900; line-height:.95; color:white; margin-bottom:8px; }
+  h1 span { color:var(--accent); }
+  .header-sub { font-size:15px; font-weight:300; color:rgba(255,255,255,.55); margin-top:12px; line-height:1.5; max-width:480px; }
+
+  .stats-bar { background:var(--slope); padding:0 32px; }
+  .stats-inner { max-width:680px; margin:0 auto; display:flex; }
+  .stat-item { flex:1; padding:16px 0; border-right:1px solid rgba(255,255,255,.08); text-align:center; }
+  .stat-item:last-child { border-right:none; }
+  .stat-val { font-family:'Barlow Condensed',sans-serif; font-size:26px; font-weight:700; color:var(--accent); line-height:1; }
+  .stat-lbl { font-size:10px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.4); margin-top:3px; }
+
+  .main { max-width:680px; margin:0 auto; padding:28px 32px 48px; }
+
+  .diag-box { background:white; border:1px solid var(--border); border-left:4px solid var(--warm); border-radius:10px; padding:16px 18px; margin-bottom:28px; }
+  .diag-label { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--warm); margin-bottom:8px; }
+  .diag-text { font-size:13px; line-height:1.65; color:var(--muted); }
+  .diag-text strong { color:var(--text); font-weight:500; }
+
+  .section-hdr { display:flex; align-items:center; gap:12px; margin-bottom:14px; margin-top:28px; }
+  .section-icon { width:50px; height:50px; flex-shrink:0; }
+  .section-num { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:white; background:var(--slope); padding:3px 10px 2px; border-radius:3px; }
+  .section-title { font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; color:var(--slope); }
+  .section-line { flex:1; height:1px; background:var(--border); }
+
+  .ex-card { background:white; border:1px solid var(--border); border-radius:12px; margin-bottom:10px; overflow:hidden; transition:box-shadow .2s,border-color .2s; cursor:pointer; }
+  .ex-card:hover { border-color:#b0c8e0; box-shadow:0 2px 12px rgba(26,39,68,.07); }
+  .ex-card.priority { border-color:#9ee0c8; }
+  .ex-card.priority .ex-header { border-left:3px solid var(--accent2); }
+  .ex-header { display:grid; grid-template-columns:52px 1fr auto; align-items:center; gap:12px; padding:14px 16px; }
+  .ex-time-col { text-align:center; }
+  .ex-minute { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; color:var(--accent); line-height:1; }
+  .ex-minute-lbl { font-size:9px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .ex-name { font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700; color:var(--slope); line-height:1.1; }
+  .ex-target { font-size:11px; color:var(--muted); margin-top:2px; }
+  .ex-meta { text-align:right; }
+  .ex-sets { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:600; color:var(--text); line-height:1; }
+  .ex-rest { font-size:10px; color:var(--muted); margin-top:2px; }
+  .ex-body { border-top:1px solid var(--border); padding:14px 16px; display:none; background:#fafcfe; }
+  .ex-body.open { display:block; }
+  .ex-arrow { font-size:11px; color:var(--muted); margin-left:4px; transition:transform .2s; display:inline-block; }
+  .ex-card.open .ex-arrow { transform:rotate(180deg); }
+
+  .badge-row { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+  .badge { font-size:10px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; padding:3px 9px; border-radius:3px; }
+  .b-blue { background:#e0eef8; color:#1a5a8a; }
+  .b-green { background:#ddf5ec; color:#0a6644; }
+  .b-amber { background:#fdefd5; color:#7a4a08; }
+  .b-red { background:#fde8e8; color:#8a1a1a; }
+
+  .ex-steps { list-style:none; }
+  .ex-steps li { font-size:13px; line-height:1.6; color:#3d5068; padding:5px 0 5px 18px; position:relative; border-bottom:1px solid #eef2f7; }
+  .ex-steps li:last-child { border-bottom:none; }
+  .ex-steps li::before { content:'→'; position:absolute; left:0; color:var(--accent); font-weight:600; font-size:11px; top:7px; }
+  .ex-steps li strong { color:var(--slope); font-weight:500; }
+  .hl { background:#fff3d5; color:#7a4a08; padding:1px 5px; border-radius:3px; font-size:11px; font-weight:600; }
+  .ex-why { margin-top:10px; padding:10px 12px; background:#eef5fb; border-radius:6px; font-size:12px; line-height:1.6; color:#3d5068; }
+  .ex-why strong { color:var(--slope); }
+
+  .rest-bar { display:flex; align-items:center; gap:10px; padding:7px 16px; background:#f5f8fb; border:1px dashed var(--border); border-radius:8px; margin-bottom:10px; }
+  .rest-text { font-size:12px; color:var(--muted); }
+  .rest-text strong { color:var(--text); }
+
+  .footer-box { background:var(--deep); color:white; border-radius:14px; padding:24px; margin-top:28px; display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .footer-title { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:800; letter-spacing:.02em; text-transform:uppercase; color:white; grid-column:1/-1; margin-bottom:4px; }
+  .footer-title span { color:var(--accent2); }
+  .f-val { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:700; color:var(--accent); line-height:1; }
+  .f-lbl { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; }
+  .result-list { grid-column:1/-1; border-top:1px solid rgba(255,255,255,.1); padding-top:14px; margin-top:4px; }
+  .result-list li { font-size:12px; line-height:1.7; color:rgba(255,255,255,.6); padding-left:14px; position:relative; list-style:none; }
+  .result-list li::before { content:'✓'; position:absolute; left:0; color:var(--accent2); font-weight:700; }
+
+  @media(max-width:500px){
+    .main{padding:20px 16px 40px;} .header{padding:28px 16px 24px;} .stats-bar{padding:0 16px;} h1{font-size:38px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-tag">Ski kondicionalni trening</div>
+    <h1>20-MIN<br><span>PROGRAM</span></h1>
+    <p class="header-sub">Specifičan program za korekciju pasivne lijeve noge, "A" stava i kasnog prenosa težine u lijevom zavoju.</p>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-val">20</div><div class="stat-lbl">Minuta</div></div>
+    <div class="stat-item"><div class="stat-val">6</div><div class="stat-lbl">Vježbi</div></div>
+    <div class="stat-item"><div class="stat-val">3×</div><div class="stat-lbl">Sedmično</div></div>
+    <div class="stat-item"><div class="stat-val">4–6</div><div class="stat-lbl">Sedmica</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="diag-box">
+    <div class="diag-label">Dijagnoza problema</div>
+    <div class="diag-text">
+      <strong>Zašto podižeš lijevu skiju:</strong> Pri skretanju udesno, lijeva noga je vanjska i treba nositi 70–80% težine. Zbog pasivne lijeve noge i pritiska na peti (backseat), lijeva skija gubi kontakt sa snijegom i "pluta" — jedini izlaz je da je fizički podigneš. Program ispod direktno rješava sve tri komponente: <strong>pritisak stopala, aktivaciju adduktora</strong> i <strong>propriocepciju lijeve noge</strong>.
+    </div>
+  </div>
+
+  <!-- ===== BLOK 1 ===== -->
+  <div class="section-hdr">
+    <!-- ICON: lower leg / shin + foot highlighted -->
+    <svg class="section-icon" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="25" cy="9" rx="7" ry="8" fill="#b5d4f4"/>
+      <rect x="18" y="16" width="14" height="13" rx="5" fill="#b5d4f4"/>
+      <path d="M19 29 Q18 39 19 43 L31 43 Q32 39 31 29Z" fill="#f0a045"/>
+      <rect x="15" y="41" width="20" height="7" rx="4" fill="#185FA5" opacity=".85"/>
+      <circle cx="20" cy="47" r="2.5" fill="#2dc89a"/>
+      <circle cx="25" cy="47" r="2.5" fill="#2dc89a"/>
+      <circle cx="30" cy="47" r="2.5" fill="#2dc89a"/>
+      <path d="M11 36 Q13 32 15 36" stroke="#f0a045" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M35 36 Q37 32 39 36" stroke="#f0a045" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="section-num">Blok 1</div>
+    <div class="section-title">Pritisak stopala</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="ex-card" onclick="toggle(this)">
+    <div class="ex-header">
+      <div class="ex-time-col"><div class="ex-minute">0</div><div class="ex-minute-lbl">min</div></div>
+      <div class="ex-info">
+        <div class="ex-name">Pritisak prstiju uz zid <span class="ex-arrow">▾</span></div>
+        <div class="ex-target">Mišić lista · potkolenica · prednji pritisak skije</div>
+      </div>
+      <div class="ex-meta"><div class="ex-sets">3 × 1 min</div><div class="ex-rest">odmor 30s</div></div>
+    </div>
+    <div class="ex-body">
+      <div class="badge-row">
+        <span class="badge b-blue">Mišić lista</span>
+        <span class="badge b-blue">Tibialis anterior</span>
+        <span class="badge b-green">Osnovna vježba</span>
+      </div>
+
+      <!-- ILLUSTRATION -->
+      <div style="display:flex;gap:14px;margin-bottom:12px;padding:12px;background:#f0f6fc;border-radius:8px;align-items:flex-start;">
+        <svg width="110" height="130" viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+          <!-- wall -->
+          <rect x="88" y="5" width="10" height="120" rx="3" fill="#C8C6BB"/>
+          <line x1="88" y1="30" x2="98" y2="30" stroke="#B4B2A9" stroke-width="0.7"/>
+          <line x1="88" y1="55" x2="98" y2="55" stroke="#B4B2A9" stroke-width="0.7"/>
+          <line x1="88" y1="80" x2="98" y2="80" stroke="#B4B2A9" stroke-width="0.7"/>
+          <!-- floor -->
+          <line x1="5" y1="122" x2="90" y2="122" stroke="#B4B2A9" stroke-width="1.2"/>
+          <!-- shadow -->
+          <ellipse cx="42" cy="124" rx="28" ry="4" fill="#D3D1C7" opacity=".5"/>
+          <!-- BACK leg -->
+          <line x1="47" y1="82" x2="40" y2="105" stroke="#5F5E5A" stroke-width="9" stroke-linecap="round"/>
+          <line x1="40" y1="105" x2="38" y2="120" stroke="#5F5E5A" stroke-width="8" stroke-linecap="round"/>
+          <!-- back arm to wall -->
+          <line x1="52" y1="56" x2="72" y2="62" stroke="#5F5E5A" stroke-width="8" stroke-linecap="round"/>
+          <!-- BACK forearm on wall (highlighted) -->
+          <line x1="72" y1="62" x2="87" y2="60" stroke="#5F5E5A" stroke-width="7" stroke-linecap="round"/>
+          <!-- FRONT leg -->
+          <line x1="52" y1="80" x2="44" y2="103" stroke="#2C2C2A" stroke-width="11" stroke-linecap="round"/>
+          <!-- SHIN highlighted orange (pressing boot tongue) -->
+          <line x1="44" y1="103" x2="41" y2="120" stroke="#f0a045" stroke-width="9" stroke-linecap="round"/>
+          <!-- toe pressure dots -->
+          <circle cx="33" cy="120" r="4" fill="#2dc89a"/>
+          <circle cx="39" cy="120" r="3.5" fill="#2dc89a"/>
+          <!-- boots -->
+          <rect x="22" y="113" width="32" height="10" rx="4" fill="#185FA5"/>
+          <!-- TORSO -->
+          <path d="M42 52 Q55 46 64 54 L60 82 Q53 86 46 84Z" fill="#378ADD"/>
+          <!-- FRONT arm to wall (highlighted) -->
+          <line x1="46" y1="60" x2="68" y2="68" stroke="#185FA5" stroke-width="10" stroke-linecap="round"/>
+          <!-- forearm highlighted on wall -->
+          <line x1="68" y1="68" x2="87" y2="66" stroke="#185FA5" stroke-width="8" stroke-linecap="round"/>
+          <!-- forearm contact patch on wall -->
+          <rect x="85" y="57" width="5" height="22" rx="2" fill="#185FA5" opacity=".8"/>
+          <!-- HEAD -->
+          <ellipse cx="53" cy="34" rx="14" ry="15" fill="#FAC775"/>
+          <ellipse cx="43" cy="38" rx="4" ry="5" fill="#F0997B"/>
+          <path d="M58 20 Q53 12 44 15 Q37 19 38 26 Q44 15 55 18 Q60 20 58 28Z" fill="#2C2C2A"/>
+          <circle cx="59" cy="31" r="2.5" fill="#2C2C2A"/>
+          <circle cx="60" cy="30" r="1" fill="white"/>
+          <rect x="46" y="48" width="10" height="7" rx="3" fill="#FAC775"/>
+          <!-- pull arrow -->
+          <path d="M22 72 L8 72" stroke="#E24B4A" stroke-width="1.8" stroke-dasharray="4 3" fill="none" marker-end="url(#pa1)"/>
+          <defs><marker id="pa1" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="#E24B4A" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+          <!-- toe arrow down -->
+          <path d="M34 113 L34 106" stroke="#2dc89a" stroke-width="1.8" fill="none" marker-end="url(#ta1)"/>
+          <defs><marker id="ta1" viewBox="0 0 8 8" refX="4" refY="1" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L4 7L7 1" fill="none" stroke="#2dc89a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+        </svg>
+        <div style="font-size:12px;color:#3d5068;line-height:1.7;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--slope);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em;">Opis stava</div>
+          <b style="color:var(--slope);">Tijelo:</b> Lagano nagnuto prema naprijed, leđa ravna — ne sagnuta. Kut između torza i butina oko 100–110°.<br>
+          <b style="color:var(--slope);">Podlaktice:</b> Ravno naslonjene na zid, ne šake. Laktovi savijeni ~90°, u visini prsa.<br>
+          <b style="color:var(--slope);">Koljena:</b> Gurnuta naprijed dok <span style="color:#f0a045;font-weight:600;">potkolenica (narančasto)</span> ne pritisne jezik pancerice. Ne smiju ići prema unutra.<br>
+          <b style="color:var(--slope);">Stopala:</b> <span style="color:#2dc89a;font-weight:600;">Prsti (zeleno)</span> aktivno pritišću pod. Peta ostaje na tlu. Težina na prednje 2/3 stopala.<br>
+          <b style="color:#E24B4A;">Crvena strelica</b> = zamišljeno vučenje unazad. Odupireš se prstima.
+        </div>
+      </div>
+
+      <ul class="ex-steps">
+        <li><strong>Postavljanje:</strong> Stani 30–40 cm od zida, licem prema njemu. Nasloni <strong>podlaktice</strong> (ne šake!) na zid u visini prsa — laktovi savijeni pod otprilike 90°.</li>
+        <li><strong>Koljena naprijed:</strong> Blago savij koljena i gurni ih prema naprijed dok potkolenica <strong>snažno ne pritisne jezik pancerice</strong>. Osjeti taj čvrsti kontakt.</li>
+        <li><strong>Simulacija vučenja:</strong> Zamišljaj da te neko vuče za pojas unazad prema zidu. Odupri se tako što <strong>pritišćeš prste nogu u pod</strong> — peta ostaje na tlu cijelo vrijeme.</li>
+        <li><strong>Trajanje:</strong> Drži poziciju 1 minutu bez prekida. <span class="hl">Tražiš: zatezanje u listovima + pritisak potkolenice na pancerice</span></li>
+        <li><strong>Cilj:</strong> 3 serije × 1 minuta, odmor 30 sekundi između serija.</li>
+      </ul>
+      <div class="ex-why">
+        <strong>Zašto ovo radi:</strong> "Backseat" (sjedenje na repovima skija) je tvoj glavni neprijatelj. Kad si na petama, vrhovi skija gube kontakt sa snijegom — lijeva skija ne može zagristi i zaokrenuti. Ova vježba gradi osjećaj pritiska na prednji dio skije koji je osnova svake kontrole na terenu.
+      </div>
+    </div>
+  </div>
+
+  <div class="rest-bar">
+    <span class="rest-text"><strong>Blok 1 ukupno: ~5 min</strong> &nbsp;·&nbsp; 3 serije × 1 min + odmori</span>
+  </div>
+
+  <!-- ===== BLOK 2 ===== -->
+  <div class="section-hdr">
+    <!-- ICON: inner thighs + pillow between knees -->
+    <svg class="section-icon" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="25" cy="9" rx="7" ry="8" fill="#b5d4f4"/>
+      <rect x="18" y="16" width="14" height="11" rx="4" fill="#b5d4f4"/>
+      <!-- inner thighs highlighted amber -->
+      <path d="M22 27 Q17 30 17 40 L22 40 Q23 32 24 27Z" fill="#f0a045"/>
+      <path d="M28 27 Q33 30 33 40 L28 40 Q27 32 26 27Z" fill="#f0a045"/>
+      <!-- pillow between knees -->
+      <ellipse cx="25" cy="36" rx="7" ry="5" fill="#F5C4B3" stroke="#D85A30" stroke-width="1.2"/>
+      <!-- squeeze arrows -->
+      <path d="M14 36 L18 36" stroke="#2dc89a" stroke-width="1.8" stroke-linecap="round" marker-end="url(#ga)"/>
+      <path d="M36 36 L32 36" stroke="#2dc89a" stroke-width="1.8" stroke-linecap="round" marker-end="url(#gb)"/>
+      <!-- shins -->
+      <path d="M17 40 L17 47 L22 47 L22 40Z" fill="#b5d4f4"/>
+      <path d="M33 40 L33 47 L28 47 L28 40Z" fill="#b5d4f4"/>
+      <defs>
+        <marker id="ga" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="3" markerHeight="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#2dc89a" stroke-width="1.5"/></marker>
+        <marker id="gb" viewBox="0 0 6 6" refX="1" refY="3" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M6 0L0 3L6 6" fill="none" stroke="#2dc89a" stroke-width="1.5"/></marker>
+      </defs>
+    </svg>
+    <div class="section-num">Blok 2</div>
+    <div class="section-title">Kontrola koljena — "A" stav</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="ex-card" onclick="toggle(this)">
+    <div class="ex-header">
+      <div class="ex-time-col"><div class="ex-minute">5</div><div class="ex-minute-lbl">min</div></div>
+      <div class="ex-info">
+        <div class="ex-name">Ljepljiva koljena — jastuk <span class="ex-arrow">▾</span></div>
+        <div class="ex-target">Adduktori · unutrašnja bedra · sprječava "A" stav</div>
+      </div>
+      <div class="ex-meta"><div class="ex-sets">2 × 90s</div><div class="ex-rest">odmor 30s</div></div>
+    </div>
+    <div class="ex-body">
+      <div class="badge-row">
+        <span class="badge b-amber">Adduktori</span>
+        <span class="badge b-amber">Unutrašnja bedra</span>
+        <span class="badge b-red">Direktno: "A" stav</span>
+      </div>
+
+      <!-- ILLUSTRATION -->
+      <div style="display:flex;gap:14px;margin-bottom:12px;padding:12px;background:#fdf7ee;border-radius:8px;align-items:flex-start;">
+        <svg width="130" height="130" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+          <!-- floor -->
+          <line x1="10" y1="122" x2="120" y2="122" stroke="#B4B2A9" stroke-width="1.2"/>
+          <ellipse cx="65" cy="124" rx="38" ry="4" fill="#D3D1C7" opacity=".5"/>
+          <!-- BACK legs muted -->
+          <line x1="61" y1="82" x2="49" y2="108" stroke="#5F5E5A" stroke-width="10" stroke-linecap="round"/>
+          <line x1="49" y1="108" x2="46" y2="120" stroke="#5F5E5A" stroke-width="8" stroke-linecap="round"/>
+          <line x1="69" y1="82" x2="81" y2="108" stroke="#5F5E5A" stroke-width="10" stroke-linecap="round"/>
+          <line x1="81" y1="108" x2="84" y2="120" stroke="#5F5E5A" stroke-width="8" stroke-linecap="round"/>
+          <!-- PILLOW between knees - highlighted -->
+          <ellipse cx="65" cy="100" rx="18" ry="13" fill="#F5C4B3" stroke="#D85A30" stroke-width="1.5"/>
+          <line x1="50" y1="96" x2="80" y2="96" stroke="#F0997B" stroke-width="0.8" opacity=".6"/>
+          <line x1="48" y1="102" x2="82" y2="102" stroke="#F0997B" stroke-width="0.8" opacity=".6"/>
+          <!-- squeeze arrows -->
+          <path d="M32 100 L46 100" stroke="#2dc89a" stroke-width="2" stroke-linecap="round" marker-end="url(#sq1)"/>
+          <path d="M98 100 L84 100" stroke="#2dc89a" stroke-width="2" stroke-linecap="round" marker-end="url(#sq2)"/>
+          <defs>
+            <marker id="sq1" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="#2dc89a" stroke-width="1.5" stroke-linecap="round"/></marker>
+            <marker id="sq2" viewBox="0 0 8 8" refX="2" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M7 1L1 4L7 7" fill="none" stroke="#2dc89a" stroke-width="1.5" stroke-linecap="round"/></marker>
+          </defs>
+          <!-- FRONT legs -->
+          <line x1="57" y1="80" x2="45" y2="106" stroke="#2C2C2A" stroke-width="13" stroke-linecap="round"/>
+          <line x1="73" y1="80" x2="85" y2="106" stroke="#2C2C2A" stroke-width="13" stroke-linecap="round"/>
+          <line x1="45" y1="106" x2="43" y2="120" stroke="#2C2C2A" stroke-width="10" stroke-linecap="round"/>
+          <line x1="85" y1="106" x2="87" y2="120" stroke="#2C2C2A" stroke-width="10" stroke-linecap="round"/>
+          <!-- boots -->
+          <rect x="26" y="113" width="28" height="10" rx="4" fill="#185FA5"/>
+          <rect x="76" y="113" width="28" height="10" rx="4" fill="#185FA5"/>
+          <!-- TORSO -->
+          <path d="M50 50 Q65 43 80 50 L76 82 Q65 87 54 82Z" fill="#378ADD"/>
+          <!-- hip band - orange highlight showing pelvis -->
+          <rect x="49" y="72" width="32" height="13" rx="6" fill="#f0a045" opacity=".85"/>
+          <!-- hip sway arrows -->
+          <path d="M40 78 L47 78" stroke="#1a2744" stroke-width="1.5" stroke-linecap="round" marker-end="url(#ha1)"/>
+          <path d="M90 78 L83 78" stroke="#1a2744" stroke-width="1.5" stroke-linecap="round" marker-end="url(#ha2)"/>
+          <defs>
+            <marker id="ha1" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="4" markerHeight="4" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="#1a2744" stroke-width="1.5" stroke-linecap="round"/></marker>
+            <marker id="ha2" viewBox="0 0 8 8" refX="2" refY="4" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M7 1L1 4L7 7" fill="none" stroke="#1a2744" stroke-width="1.5" stroke-linecap="round"/></marker>
+          </defs>
+          <!-- arms - steering wheel -->
+          <line x1="54" y1="58" x2="38" y2="70" stroke="#185FA5" stroke-width="9" stroke-linecap="round"/>
+          <line x1="76" y1="58" x2="92" y2="70" stroke="#185FA5" stroke-width="9" stroke-linecap="round"/>
+          <ellipse cx="65" cy="68" rx="20" ry="14" fill="none" stroke="#2C2C2A" stroke-width="5"/>
+          <line x1="65" y1="57" x2="65" y2="63" stroke="#2C2C2A" stroke-width="4" stroke-linecap="round"/>
+          <line x1="65" y1="73" x2="65" y2="79" stroke="#2C2C2A" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="65" cy="68" r="5" fill="#2C2C2A"/>
+          <!-- HEAD -->
+          <ellipse cx="65" cy="28" rx="14" ry="15" fill="#FAC775"/>
+          <ellipse cx="52" cy="32" rx="4" ry="5" fill="#F0997B"/>
+          <ellipse cx="78" cy="32" rx="4" ry="5" fill="#F0997B"/>
+          <path d="M53 16 Q65 8 77 16 Q82 22 80 28 Q70 14 65 14 Q60 14 50 28 Q48 22 53 16Z" fill="#2C2C2A"/>
+          <circle cx="58" cy="25" r="2.5" fill="#2C2C2A"/>
+          <circle cx="72" cy="25" r="2.5" fill="#2C2C2A"/>
+          <rect x="59" y="42" width="12" height="8" rx="3" fill="#FAC775"/>
+        </svg>
+        <div style="font-size:12px;color:#3d5068;line-height:1.7;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--slope);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em;">Opis stava</div>
+          <b style="color:var(--slope);">Noge:</b> Polučučanj — koljena savijena ~100°, noge na širini ramena. Stopala, koljena i ramena <strong style="color:#E24B4A;">ne miču se</strong> tokom vježbe.<br>
+          <b style="color:var(--slope);">Jastuk:</b> <span style="color:#D85A30;font-weight:600;">Između koljena</span>, stisnut bedrima — ne samo koljenima. Osjeti napetost unutrašnjih mišića bedra.<br>
+          <b style="color:var(--slope);">Ruke:</b> Ispred tijela kao volan kamiona. Laktovi savijeni, ramena opuštena.<br>
+          <b style="color:#f0a045;font-weight:600;">Narančasti pojas</b> = zdjelica — jedini dio koji se pomiče lijevo-desno.<br>
+          <b style="color:#2dc89a;font-weight:600;">Zelene strelice</b> = stisak bedrima prema jastuку.
+        </div>
+      </div>
+
+      <ul class="ex-steps">
+        <li><strong>Priprema:</strong> Uzmi manji jastuk ili mekšu loptu i stavi između koljena. Stani u skijaški polučučanj — noge na širini ramena, koljena blago savijena.</li>
+        <li><strong>Ruke — volan kamiona:</strong> Drži ruke ispred sebe kao da stiskaš <strong>volan kamiona</strong>. Laktovi savijeni, ramena opuštena, pogled ravno naprijed.</li>
+        <li><strong>Stisni jastuk:</strong> Unutrašnjom stranom bedara stisni jastuk prema sredini. Ne samo koljenima — <strong>cijelim bedrima</strong> osjeti napetost adduktora.</li>
+        <li><strong>Pokret kukova:</strong> Pomakni <strong>samo zdjelicu</strong> lijevo-desno. Stopala, koljena, ramena i glava ostaju <strong>potpuno fiksni</strong> — samo "pojas" klizi kao ladica.</li>
+        <li><strong>Ritam:</strong> 2 sekunde lijevo, 2 sekunde desno, kontinuirano. <span class="hl">Jastuk ispadne = koljena su se razdvojila = A-stav na snijegu</span></li>
+        <li><strong>Cilj:</strong> 2 serije × 90 sekundi, odmor 30 sekundi između.</li>
+      </ul>
+      <div class="ex-why">
+        <strong>Zašto ovo radi:</strong> Adduktori su jedini mišići koji drže skije paralelno tokom zavoja. Kad su slabi, unutrašnja noga gubi kontakt i skija bježi van — a ti je moraš podizati. Ova vježba ih direktno izolira i jača u poziciji identičnoj skijaškom stavu.
+      </div>
+    </div>
+  </div>
+
+  <div class="rest-bar">
+    <span class="rest-text"><strong>Blok 2 ukupno: ~4 min</strong> &nbsp;·&nbsp; 2 serije × 90s + odmori</span>
+  </div>
+
+  <!-- ===== BLOK 3 ===== -->
+  <div class="section-hdr">
+    <!-- ICON: left leg green/active, right leg faded -->
+    <svg class="section-icon" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="25" cy="9" rx="7" ry="8" fill="#b5d4f4"/>
+      <rect x="18" y="16" width="14" height="11" rx="4" fill="#b5d4f4"/>
+      <!-- right leg faded -->
+      <path d="M27 27 Q31 29 31 40 L28 40 Q27 32 26 27Z" fill="#b5d4f4" opacity=".3"/>
+      <rect x="26" y="40" width="6" height="7" rx="2" fill="#b5d4f4" opacity=".3"/>
+      <!-- left leg — highlighted green, active -->
+      <path d="M23 27 Q19 29 19 40 L22 40 Q23 32 24 27Z" fill="#2dc89a"/>
+      <rect x="17" y="40" width="7" height="7" rx="2" fill="#0F6E56"/>
+      <rect x="14" y="45" width="12" height="4" rx="2" fill="#185FA5"/>
+      <!-- balance wobble lines -->
+      <path d="M7 34 Q9 30 11 34 Q13 38 15 34" stroke="#f0a045" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <!-- star priority -->
+      <text x="33" y="14" font-size="11" fill="#f0a045" font-family="sans-serif">★</text>
+      <!-- weight % label -->
+      <rect x="30" y="32" width="14" height="9" rx="3" fill="#ddf5ec"/>
+      <text x="37" y="39" text-anchor="middle" font-size="7" fill="#0a6644" font-family="sans-serif" font-weight="bold">70%</text>
+    </svg>
+    <div class="section-num">Blok 3</div>
+    <div class="section-title">Lijeva noga — prioritet ★</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="ex-card priority" onclick="toggle(this)">
+    <div class="ex-header">
+      <div class="ex-time-col"><div class="ex-minute">9</div><div class="ex-minute-lbl">min</div></div>
+      <div class="ex-info">
+        <div class="ex-name">Balans na lijevoj nozi <span class="ex-arrow">▾</span></div>
+        <div class="ex-target">Propriocepcija · neurološka aktivacija lijeve noge</div>
+      </div>
+      <div class="ex-meta"><div class="ex-sets">3 × 30s</div><div class="ex-rest">odmor 20s</div></div>
+    </div>
+    <div class="ex-body">
+      <div class="badge-row">
+        <span class="badge b-green">Propriocepcija</span>
+        <span class="badge b-green">Lijeva noga</span>
+        <span class="badge b-red">Prioritet #1</span>
+      </div>
+
+      <!-- ILLUSTRATION -->
+      <div style="display:flex;gap:14px;margin-bottom:12px;padding:12px;background:#f0faf5;border-radius:8px;align-items:flex-start;">
+        <svg width="110" height="130" viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+          <!-- floor -->
+          <line x1="10" y1="122" x2="100" y2="122" stroke="#B4B2A9" stroke-width="1.2"/>
+          <ellipse cx="48" cy="124" rx="24" ry="4" fill="#D3D1C7" opacity=".5"/>
+          <!-- RIGHT leg lifted & faded -->
+          <line x1="60" y1="82" x2="82" y2="96" stroke="#B4B2A9" stroke-width="9" stroke-linecap="round"/>
+          <line x1="82" y1="96" x2="88" y2="112" stroke="#B4B2A9" stroke-width="7" stroke-linecap="round"/>
+          <rect x="76" y="108" width="20" height="8" rx="3" fill="#B4B2A9" opacity=".5"/>
+          <!-- LEFT leg — GREEN active -->
+          <line x1="52" y1="80" x2="42" y2="106" stroke="#2dc89a" stroke-width="14" stroke-linecap="round"/>
+          <line x1="42" y1="106" x2="38" y2="120" stroke="#1D9E75" stroke-width="11" stroke-linecap="round"/>
+          <!-- boot left -->
+          <rect x="22" y="113" width="30" height="10" rx="4" fill="#185FA5"/>
+          <rect x="22" y="113" width="30" height="5" rx="4" fill="#0C447C" opacity=".35"/>
+          <!-- weight line -->
+          <line x1="38" y1="120" x2="55" y2="82" stroke="#2dc89a" stroke-width="1.2" stroke-dasharray="4 3" opacity=".5"/>
+          <!-- 70% badge -->
+          <rect x="60" y="104" width="28" height="14" rx="5" fill="#ddf5ec"/>
+          <text x="74" y="115" text-anchor="middle" font-size="9" fill="#0a6644" font-family="sans-serif" font-weight="bold">70%</text>
+          <!-- wobble lines -->
+          <path d="M8 75 Q11 70 14 75 Q17 80 20 75" stroke="#f0a045" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- TORSO -->
+          <path d="M42 50 Q55 44 67 52 L63 82 Q55 87 47 84Z" fill="#378ADD"/>
+          <!-- arms forward -->
+          <line x1="47" y1="60" x2="28" y2="72" stroke="#185FA5" stroke-width="10" stroke-linecap="round"/>
+          <line x1="63" y1="60" x2="80" y2="72" stroke="#185FA5" stroke-width="10" stroke-linecap="round"/>
+          <ellipse cx="23" cy="73" rx="8" ry="7" fill="#FAC775"/>
+          <ellipse cx="85" cy="73" rx="8" ry="7" fill="#FAC775"/>
+          <!-- neck -->
+          <rect x="50" y="36" width="10" height="15" rx="4" fill="#FAC775"/>
+          <!-- HEAD -->
+          <ellipse cx="55" cy="24" rx="14" ry="15" fill="#FAC775"/>
+          <ellipse cx="43" cy="28" rx="4" ry="5" fill="#F0997B"/>
+          <ellipse cx="67" cy="28" rx="4" ry="5" fill="#F0997B"/>
+          <path d="M43 12 Q55 5 67 12 Q72 18 70 24 Q60 12 55 12 Q50 12 40 24 Q38 18 43 12Z" fill="#2C2C2A"/>
+          <circle cx="50" cy="21" r="2.5" fill="#2C2C2A"/>
+          <circle cx="60" cy="21" r="2.5" fill="#2C2C2A"/>
+          <!-- "L" label on left leg -->
+          <circle cx="42" cy="93" r="8" fill="#0F6E56"/>
+          <text x="42" y="97" text-anchor="middle" font-size="9" fill="white" font-family="sans-serif" font-weight="bold">L</text>
+        </svg>
+        <div style="font-size:12px;color:#3d5068;line-height:1.7;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--slope);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em;">Opis stava</div>
+          <b style="color:var(--slope);">Lijeva noga</b> <span style="color:#2dc89a;font-weight:600;">(zelena = aktivna)</span>: Koljeno blago savijeno 15–20°, isto kao skijaški stav. Ne ispruženo, ne prejako savijeno.<br>
+          <b style="color:var(--slope);">Desna noga</b> <span style="color:#B4B2A9;font-weight:600;">(siva = pasivna)</span>: U zraku, lagano savijena prema natrag ili pred sobom.<br>
+          <b style="color:var(--slope);">Ruke:</b> Blago ispred tijela za ravnotežu. Ne uz tijelo — to otežava balans.<br>
+          <b style="color:var(--slope);">Stopalo:</b> Cijelo stopalo na podu — peta, lopatica, svi prsti. Osjeti svaki kontakt.<br>
+          <b style="color:#f0a045;font-weight:600;">Žuti talasi</b> = normalno ljuljanje — nemoj se boriti protiv njega, pusti tijelo da se prilagodi.
+        </div>
+      </div>
+
+      <ul class="ex-steps">
+        <li><strong>Postavljanje:</strong> Stani na <strong>samo lijevu nogu</strong>, desna u zraku. Koljeno blago savijeno — skijaški stav, ne ispruženo.</li>
+        <li><strong>Serija 1 — oči otvorene:</strong> Drži balans 30 sekundi. Fokus na cijelom stopalu — peta, lopatica i <strong>prsti ravnomjerno pritišću pod</strong>.</li>
+        <li><strong>Serija 2 — oči zatvorene:</strong> Isti položaj, ali zatvori oči. Mnogo teže — ovo je pravi neurološki rad. Normalno je ako se ljuljaš.</li>
+        <li><strong>Serija 3 — simulacija zavoja:</strong> Oči otvorene, ali rotiraj gornji dio tijela udesno (kao da skrećeš u lijevi zavoj na skijama). <span class="hl">Lijeva noga ostaje čvrsto zakucana — ne pomiče se!</span></li>
+        <li><strong>Cilj:</strong> 3 serije, odmor 20 sekundi između. Napreduj na jastuče ili zatvorene oči u seriji 3.</li>
+      </ul>
+      <div class="ex-why">
+        <strong>Zašto je ovo prioritet #1:</strong> Lijeva noga je "pasivna" jer mozak nikad nije svjesno trenirao neurološku vezu s njom. Godinama si skijao pretežno na desnoj — lijeva je samo pratila. Ovom vježbom direktno rebuilduješ tu neuralnu vezu. Kad lijeva noga postane sigurna oslona, automatski preuzme 70% težine u lijevom zavoju.
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card priority" onclick="toggle(this)">
+    <div class="ex-header">
+      <div class="ex-time-col"><div class="ex-minute">12</div><div class="ex-minute-lbl">min</div></div>
+      <div class="ex-info">
+        <div class="ex-name">Mini čučanj — lijeva noga <span class="ex-arrow">▾</span></div>
+        <div class="ex-target">Kvadriceps · snaga i kontrola lijeve noge u zavoju</div>
+      </div>
+      <div class="ex-meta"><div class="ex-sets">3 × 10 rep</div><div class="ex-rest">odmor 30s</div></div>
+    </div>
+    <div class="ex-body">
+      <div class="badge-row">
+        <span class="badge b-green">Lijeva noga</span>
+        <span class="badge b-green">Kvadriceps</span>
+        <span class="badge b-red">Prioritet #2</span>
+      </div>
+
+      <!-- ILLUSTRATION: two positions side by side -->
+      <div style="display:flex;gap:14px;margin-bottom:12px;padding:12px;background:#f0faf5;border-radius:8px;align-items:flex-start;">
+        <svg width="150" height="130" viewBox="0 0 150 130" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+          <!-- floor -->
+          <line x1="5" y1="122" x2="145" y2="122" stroke="#B4B2A9" stroke-width="1.2"/>
+          <!-- label: GORE (up) -->
+          <text x="32" y="11" text-anchor="middle" font-size="8" fill="#6b7f99" font-family="sans-serif">gore</text>
+          <!-- label: DOLJE (down) -->
+          <text x="112" y="11" text-anchor="middle" font-size="8" fill="#6b7f99" font-family="sans-serif">dolje</text>
+
+          <!-- ===== POSITION 1: standing (gore) ===== -->
+          <!-- right leg faded -->
+          <line x1="38" y1="76" x2="45" y2="95" stroke="#B4B2A9" stroke-width="8" stroke-linecap="round"/>
+          <line x1="45" y1="95" x2="47" y2="120" stroke="#B4B2A9" stroke-width="6" stroke-linecap="round"/>
+          <!-- left leg green -->
+          <line x1="30" y1="76" x2="24" y2="100" stroke="#2dc89a" stroke-width="11" stroke-linecap="round"/>
+          <line x1="24" y1="100" x2="22" y2="120" stroke="#1D9E75" stroke-width="9" stroke-linecap="round"/>
+          <rect x="8" y="113" width="24" height="9" rx="3" fill="#185FA5"/>
+          <path d="M22 50 Q33 45 42 52 L40 76 Q33 80 26 78Z" fill="#378ADD"/>
+          <line x1="26" y1="60" x2="14" y2="70" stroke="#185FA5" stroke-width="8" stroke-linecap="round"/>
+          <line x1="40" y1="60" x2="52" y2="70" stroke="#185FA5" stroke-width="8" stroke-linecap="round"/>
+          <ellipse cx="32" cy="26" rx="11" ry="12" fill="#FAC775"/>
+          <rect x="28" y="37" width="8" height="12" rx="3" fill="#FAC775"/>
+          <path d="M23 16 Q32 9 41 16 Q45 21 43 27 Q35 16 32 16 Q29 16 21 27 Q19 21 23 16Z" fill="#2C2C2A"/>
+          <circle cx="37" cy="23" r="2" fill="#2C2C2A"/>
+
+          <!-- ===== POSITION 2: squat (dolje) ===== -->
+          <!-- right leg faded -->
+          <line x1="118" y1="68" x2="125" y2="90" stroke="#B4B2A9" stroke-width="8" stroke-linecap="round"/>
+          <line x1="125" y1="90" x2="127" y2="120" stroke="#B4B2A9" stroke-width="6" stroke-linecap="round"/>
+          <!-- left leg green, more bent, knee forward -->
+          <line x1="107" y1="68" x2="94" y2="96" stroke="#2dc89a" stroke-width="12" stroke-linecap="round"/>
+          <!-- shin forward highlighted orange -->
+          <line x1="94" y1="96" x2="90" y2="120" stroke="#f0a045" stroke-width="10" stroke-linecap="round"/>
+          <rect x="74" y="113" width="26" height="9" rx="3" fill="#185FA5"/>
+          <!-- knee forward arrow -->
+          <path d="M94 96 L78 90" stroke="#7F77DD" stroke-width="1.8" fill="none" stroke-linecap="round" marker-end="url(#kfa)"/>
+          <defs><marker id="kfa" viewBox="0 0 8 8" refX="2" refY="4" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M7 1L1 4L7 7" fill="none" stroke="#7F77DD" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+          <path d="M98 44 Q110 40 120 46 L117 68 Q110 74 103 71Z" fill="#378ADD"/>
+          <line x1="103" y1="52" x2="90" y2="64" stroke="#185FA5" stroke-width="8" stroke-linecap="round"/>
+          <line x1="117" y1="52" x2="130" y2="64" stroke="#185FA5" stroke-width="8" stroke-linecap="round"/>
+          <ellipse cx="109" cy="22" rx="11" ry="12" fill="#FAC775"/>
+          <rect x="105" y="33" width="8" height="10" rx="3" fill="#FAC775"/>
+          <path d="M100 12 Q109 5 118 12 Q122 17 120 23 Q112 12 109 12 Q106 12 98 23 Q96 17 100 12Z" fill="#2C2C2A"/>
+          <circle cx="114" cy="19" r="2" fill="#2C2C2A"/>
+
+          <!-- arrow between positions -->
+          <path d="M58 65 L75 65" stroke="#888780" stroke-width="1.5" stroke-dasharray="3 3" stroke-linecap="round"/>
+          <text x="66" y="62" text-anchor="middle" font-size="8" fill="#888780" font-family="sans-serif">3s</text>
+        </svg>
+        <div style="font-size:12px;color:#3d5068;line-height:1.7;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--slope);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em;">Opis stava</div>
+          <b style="color:var(--slope);">Lijeva noga</b> <span style="color:#2dc89a;font-weight:600;">(zelena)</span>: Nosi svu težinu. Desna noga opuštena u zraku ili lagano dotakne pod prstima.<br>
+          <b style="color:var(--slope);">Koljeno dolje:</b> Gura se <span style="color:#7F77DD;font-weight:600;">naprijed</span> iznad stopala — ne prema unutra, ne prema van. Prati smjer srednjeg prsta noge.<br>
+          <b style="color:#f0a045;font-weight:600;">Potkolenica (narančasto)</b>: Kao kod vježbe uz zid — pritišće prednji dio imaginarne pancerice. <strong style="color:var(--slope);">Peta ostaje na tlu.</strong><br>
+          <b style="color:var(--slope);">Tempo:</b> 3 sekunde spuštaj, 1 sekunda gore. Sporo je efikasno.
+        </div>
+      </div>
+
+      <ul class="ex-steps">
+        <li><strong>Postavljanje:</strong> Stani na jednu <strong>lijevu nogu</strong>, desna blago podignuta ili samo lagano oslonjena na prste za ravnotežu na početku.</li>
+        <li><strong>Koljeno naprijed:</strong> Polako spuštaj koljeno prema naprijed — mora pratiti liniju stopala (srednji prst). <strong>Ne smije ići prema unutra!</strong></li>
+        <li><strong>Tempo:</strong> 3 sekunde spuštaj dolje, 1 sekunda gore. Sporo = efikasno. Ako žuriš, gubiš koristi vježbe.</li>
+        <li><strong>Dubina:</strong> Idi dok koljeno ne bude iznad prstiju — ne dublje od 90°. Peta ostaje na tlu.</li>
+        <li><span class="hl">Ova pozicija je identična položaju vanjske noge u lijevom ski-zavoju — 10 ponavljanja = 10 treniranih zavoja</span></li>
+        <li><strong>Cilj:</strong> 3 serije × 10 ponavljanja, odmor 30 sekundi između.</li>
+      </ul>
+      <div class="ex-why">
+        <strong>Zašto ovo radi:</strong> Gradi snagu i koordinaciju lijeve noge u točno onoj poziciji u kojoj mora raditi kao vanjska noga u zavoju. Nakon 4 sedmice redovnog treninga, lijeva noga prestaje biti "pasivna" — mozak je počinje tretirati kao primarnu oslonu ravnopravno s desnom.
+      </div>
+    </div>
+  </div>
+
+  <div class="rest-bar">
+    <span class="rest-text"><strong>Blok 3 ukupno: ~7 min</strong> &nbsp;·&nbsp; balans + mini čučanj zajedno</span>
+  </div>
+
+  <!-- ===== BLOK 4 ===== -->
+  <div class="section-hdr">
+    <!-- ICON: pelvis/hip highlighted with lateral arrows, legs faded -->
+    <svg class="section-icon" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="25" cy="9" rx="7" ry="8" fill="#b5d4f4" opacity=".45"/>
+      <rect x="18" y="16" width="14" height="10" rx="4" fill="#b5d4f4" opacity=".45"/>
+      <!-- pelvis highlighted orange -->
+      <ellipse cx="25" cy="29" rx="13" ry="7" fill="#f0a045"/>
+      <rect x="13" y="26" width="24" height="7" rx="4" fill="#f0a045"/>
+      <!-- lateral arrows -->
+      <path d="M7 29.5 L12 29.5" stroke="#1a2744" stroke-width="2" stroke-linecap="round"/>
+      <path d="M10 27 L13 29.5 L10 32" stroke="#1a2744" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M43 29.5 L38 29.5" stroke="#1a2744" stroke-width="2" stroke-linecap="round"/>
+      <path d="M40 27 L37 29.5 L40 32" stroke="#1a2744" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <!-- legs faded -->
+      <path d="M19 34 Q17 40 18 47 L22 47 L22 34Z" fill="#b5d4f4" opacity=".4"/>
+      <path d="M31 34 Q33 40 32 47 L28 47 L28 34Z" fill="#b5d4f4" opacity=".4"/>
+      <!-- brain/mind icon top right for visualization -->
+      <circle cx="40" cy="10" r="5" fill="#e0eef8"/>
+      <path d="M37 10 Q38 7 40 8 Q42 7 43 10 Q43 13 40 14 Q37 13 37 10Z" fill="#3a8fd4" opacity=".7"/>
+    </svg>
+    <div class="section-num">Blok 4</div>
+    <div class="section-title">Skijaška specifičnost</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="ex-card" onclick="toggle(this)">
+    <div class="ex-header">
+      <div class="ex-time-col"><div class="ex-minute">16</div><div class="ex-minute-lbl">min</div></div>
+      <div class="ex-info">
+        <div class="ex-name">Angulacija kukova <span class="ex-arrow">▾</span></div>
+        <div class="ex-target">Zdjelica · hip angulation · ritam zavoja</div>
+      </div>
+      <div class="ex-meta"><div class="ex-sets">2 × 45s</div><div class="ex-rest">odmor 20s</div></div>
+    </div>
+    <div class="ex-body">
+      <div class="badge-row">
+        <span class="badge b-blue">Hip angulation</span>
+        <span class="badge b-blue">Zdjelica</span>
+        <span class="badge b-amber">Napredna vježba</span>
+      </div>
+
+      <!-- ILLUSTRATION: centre + left + right positions -->
+      <div style="display:flex;gap:14px;margin-bottom:12px;padding:12px;background:#eef5fb;border-radius:8px;align-items:flex-start;">
+        <svg width="160" height="130" viewBox="0 0 160 130" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+          <!-- floor -->
+          <line x1="5" y1="122" x2="155" y2="122" stroke="#B4B2A9" stroke-width="1.2"/>
+          <!-- labels -->
+          <text x="20" y="10" text-anchor="middle" font-size="8" fill="#E24B4A" font-family="sans-serif">← lijevo</text>
+          <text x="80" y="10" text-anchor="middle" font-size="8" fill="#6b7f99" font-family="sans-serif">centar</text>
+          <text x="140" y="10" text-anchor="middle" font-size="8" fill="#3a8fd4" font-family="sans-serif">desno →</text>
+
+          <!-- ===== CENTRE position ===== -->
+          <!-- legs FIXED -->
+          <line x1="76" y1="82" x2="68" y2="108" stroke="#2C2C2A" stroke-width="11" stroke-linecap="round"/>
+          <line x1="68" y1="108" x2="65" y2="120" stroke="#2C2C2A" stroke-width="9" stroke-linecap="round"/>
+          <line x1="84" y1="82" x2="92" y2="108" stroke="#2C2C2A" stroke-width="11" stroke-linecap="round"/>
+          <line x1="92" y1="108" x2="95" y2="120" stroke="#2C2C2A" stroke-width="9" stroke-linecap="round"/>
+          <rect x="50" y="113" width="22" height="9" rx="3" fill="#185FA5"/>
+          <rect x="80" y="113" width="22" height="9" rx="3" fill="#185FA5"/>
+          <!-- pillow -->
+          <ellipse cx="80" cy="96" rx="12" ry="8" fill="#F5C4B3" stroke="#D85A30" stroke-width="1"/>
+          <!-- PELVIS - centred -->
+          <rect x="66" y="74" width="28" height="12" rx="6" fill="#f0a045" opacity=".9"/>
+          <!-- torso FIXED -->
+          <path d="M68 52 Q80 46 92 52 L89 74 Q80 79 71 74Z" fill="#378ADD"/>
+          <!-- arms/wheel -->
+          <ellipse cx="80" cy="58" rx="14" ry="10" fill="none" stroke="#2C2C2A" stroke-width="4"/>
+          <circle cx="80" cy="58" r="4" fill="#2C2C2A"/>
+          <!-- HEAD fixed -->
+          <ellipse cx="80" cy="32" rx="11" ry="12" fill="#FAC775"/>
+          <rect x="76" y="43" width="8" height="9" rx="3" fill="#FAC775"/>
+          <path d="M71 22 Q80 16 89 22 Q92 27 90 32 Q83 21 80 21 Q77 21 70 32 Q68 27 71 22Z" fill="#2C2C2A"/>
+
+          <!-- ===== LEFT position (hip left, all else fixed) ===== -->
+          <!-- legs same position as centre (FIXED) -->
+          <line x1="18" y1="82" x2="10" y2="108" stroke="#2C2C2A" stroke-width="10" stroke-linecap="round" opacity=".7"/>
+          <line x1="10" y1="108" x2="8" y2="120" stroke="#2C2C2A" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+          <line x1="26" y1="82" x2="34" y2="108" stroke="#2C2C2A" stroke-width="10" stroke-linecap="round" opacity=".7"/>
+          <line x1="34" y1="108" x2="37" y2="120" stroke="#2C2C2A" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+          <rect x="0" y="113" width="18" height="8" rx="3" fill="#185FA5" opacity=".7"/>
+          <rect x="22" y="113" width="18" height="8" rx="3" fill="#185FA5" opacity=".7"/>
+          <!-- pillow moves with hip -->
+          <ellipse cx="16" cy="96" rx="11" ry="7" fill="#F5C4B3" stroke="#D85A30" stroke-width="1"/>
+          <!-- PELVIS shifted LEFT — highlighted -->
+          <rect x="6" y="74" width="26" height="11" rx="5" fill="#E24B4A" opacity=".9"/>
+          <!-- torso FIXED (same x as centre) -->
+          <path d="M10 52 Q22 47 33 52 L31 74 Q22 78 13 74Z" fill="#378ADD"/>
+          <!-- head fixed -->
+          <ellipse cx="22" cy="32" rx="10" ry="11" fill="#FAC775"/>
+          <rect x="18" y="42" width="8" height="8" rx="3" fill="#FAC775"/>
+
+          <!-- ===== RIGHT position (hip right) ===== -->
+          <line x1="136" y1="82" x2="128" y2="108" stroke="#2C2C2A" stroke-width="10" stroke-linecap="round" opacity=".7"/>
+          <line x1="128" y1="108" x2="126" y2="120" stroke="#2C2C2A" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+          <line x1="144" y1="82" x2="152" y2="108" stroke="#2C2C2A" stroke-width="10" stroke-linecap="round" opacity=".7"/>
+          <line x1="152" y1="108" x2="154" y2="120" stroke="#2C2C2A" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+          <rect x="114" y="113" width="18" height="8" rx="3" fill="#185FA5" opacity=".7"/>
+          <rect x="136" y="113" width="18" height="8" rx="3" fill="#185FA5" opacity=".7"/>
+          <ellipse cx="144" cy="96" rx="11" ry="7" fill="#F5C4B3" stroke="#D85A30" stroke-width="1"/>
+          <!-- PELVIS shifted RIGHT -->
+          <rect x="128" y="74" width="26" height="11" rx="5" fill="#3a8fd4" opacity=".9"/>
+          <path d="M126 52 Q138 47 149 52 L147 74 Q138 78 129 74Z" fill="#378ADD"/>
+          <ellipse cx="138" cy="32" rx="10" ry="11" fill="#FAC775"/>
+          <rect x="134" y="42" width="8" height="8" rx="3" fill="#FAC775"/>
+
+          <!-- "FIKSNO" labels pointing to feet -->
+          <text x="80" y="119" text-anchor="middle" font-size="7" fill="#1D9E75" font-family="sans-serif" font-weight="bold">stopala fiksna</text>
+        </svg>
+        <div style="font-size:12px;color:#3d5068;line-height:1.7;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--slope);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em;">Opis stava</div>
+          <b style="color:#E24B4A;">Crveni pojas</b> = kuk lijevo &nbsp;|&nbsp; <b style="color:#3a8fd4;">Plavi pojas</b> = kuk desno<br>
+          <b style="color:#2dc89a;font-weight:600;">Stopala, koljena, ramena, glava</b> — sve potpuno fiksno na centralnoj poziciji.<br>
+          <b style="color:var(--slope);">Pokret:</b> Samo zdjelica klizi — kao ladica. Amplituda: 5–10 cm lijevo/desno.<br>
+          <b style="color:var(--slope);">Jastuk:</b> Ostaje između koljena — ako ispadne, koljena su krenula sa zdjelicom (greška).<br>
+          <b style="color:var(--slope);">Ritam:</b> Počni sporije (2s/strana), ubrzavaj postepeno. Ne žuri — preciznost je važnija.
+        </div>
+      </div>
+
+      <ul class="ex-steps">
+        <li><strong>Postavljanje:</strong> Jastuk između koljena, skijaški polučučanj. Ruke ispred kao da držiš volan kamiona.</li>
+        <li><strong>Šta se pomiče:</strong> <strong>Samo zdjelica</strong> — kao ladica koja klizi. Stopala: fiksna. Koljena: fiksna. Ramena: fiksna. Glava: fiksna.</li>
+        <li><strong>Ritam zavoja:</strong> 2 sekunde lijevo (= lijevi zavoj), 2 sekunde desno (= desni zavoj). Kontinuirano bez zastajkivanja.</li>
+        <li><strong>Vizualizacija:</strong> Dok radiš pokret, <span class="hl">zamišljaj padinu — svaki pomak kukova je ulaz u novi zavoj</span>.</li>
+        <li>Postepeno ubrzavaj tempo: 2s → 1.5s → 1s po strani tokom serije.</li>
+        <li><strong>Cilj:</strong> 2 serije × 45 sekundi, odmor 20 sekundi između.</li>
+      </ul>
+      <div class="ex-why">
+        <strong>Zašto ovo radi:</strong> Na skijama, zavoj se inicira pokretom kukova — ne rotacijom ramena, ne nogama. Kad tijelo naučiti ovaj izoliran pokret zdjelice, skije počinju "pratiti" automatski, bez podizanja noge. Ovo je najdirektnija imitacija skijaškog zavoja u suhom treningu.
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-card" onclick="toggle(this)">
+    <div class="ex-header">
+      <div class="ex-time-col"><div class="ex-minute">18</div><div class="ex-minute-lbl">min</div></div>
+      <div class="ex-info">
+        <div class="ex-name">Vizualizacija lijevog zavoja <span class="ex-arrow">▾</span></div>
+        <div class="ex-target">Mentalni trening · neuroplastičnost · završnica</div>
+      </div>
+      <div class="ex-meta"><div class="ex-sets">2 × 60s</div><div class="ex-rest">bez odmora</div></div>
+    </div>
+    <div class="ex-body">
+      <div class="badge-row">
+        <span class="badge b-blue">Mentalni trening</span>
+        <span class="badge b-green">Neuroplastičnost</span>
+      </div>
+
+      <!-- ILLUSTRATION -->
+      <div style="display:flex;gap:14px;margin-bottom:12px;padding:12px;background:#eef3fd;border-radius:8px;align-items:flex-start;">
+        <svg width="110" height="130" viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+          <!-- imagined slope background -->
+          <path d="M5 90 Q30 50 55 30 Q80 50 105 90 L105 125 L5 125Z" fill="#e0eef8" opacity=".5"/>
+          <!-- ski tracks on slope -->
+          <path d="M35 125 Q40 90 55 60" stroke="#b5d4f4" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+          <path d="M50 125 Q55 90 55 60" stroke="#b5d4f4" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+          <!-- floor -->
+          <line x1="5" y1="125" x2="105" y2="125" stroke="#B4B2A9" stroke-width="1"/>
+          <ellipse cx="55" cy="127" rx="28" ry="3" fill="#D3D1C7" opacity=".4"/>
+          <!-- Person in ski position, eyes closed, LEFT leg highlighted -->
+          <!-- left thigh green -->
+          <line x1="50" y1="80" x2="40" y2="104" stroke="#2dc89a" stroke-width="12" stroke-linecap="round"/>
+          <line x1="40" y1="104" x2="37" y2="122" stroke="#1D9E75" stroke-width="10" stroke-linecap="round"/>
+          <!-- right thigh normal -->
+          <line x1="60" y1="80" x2="70" y2="104" stroke="#2C2C2A" stroke-width="11" stroke-linecap="round"/>
+          <line x1="70" y1="104" x2="73" y2="122" stroke="#2C2C2A" stroke-width="9" stroke-linecap="round"/>
+          <!-- boots -->
+          <rect x="22" y="115" width="26" height="9" rx="3" fill="#185FA5"/>
+          <rect x="58" y="115" width="26" height="9" rx="3" fill="#185FA5"/>
+          <!-- TORSO -->
+          <path d="M40 52 Q55 46 68 52 L65 80 Q55 85 47 81Z" fill="#378ADD"/>
+          <!-- arms forward -->
+          <line x1="47" y1="62" x2="30" y2="72" stroke="#185FA5" stroke-width="9" stroke-linecap="round"/>
+          <line x1="63" y1="62" x2="80" y2="72" stroke="#185FA5" stroke-width="9" stroke-linecap="round"/>
+          <ellipse cx="25" cy="73" rx="8" ry="6" fill="#FAC775"/>
+          <ellipse cx="85" cy="73" rx="8" ry="6" fill="#FAC775"/>
+          <!-- neck -->
+          <rect x="51" y="38" width="8" height="14" rx="3" fill="#FAC775"/>
+          <!-- HEAD eyes closed -->
+          <ellipse cx="55" cy="25" rx="13" ry="14" fill="#FAC775"/>
+          <ellipse cx="43" cy="29" rx="4" ry="5" fill="#F0997B"/>
+          <ellipse cx="67" cy="29" rx="4" ry="5" fill="#F0997B"/>
+          <path d="M44 13 Q55 6 66 13 Q70 18 68 24 Q60 13 55 13 Q50 13 42 24 Q40 18 44 13Z" fill="#2C2C2A"/>
+          <!-- EYES CLOSED -->
+          <path d="M48 22 Q51 25 54 22" stroke="#2C2C2A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M56 22 Q59 25 62 22" stroke="#2C2C2A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- brain glow -->
+          <circle cx="55" cy="22" r="20" fill="#7F77DD" opacity=".08"/>
+          <!-- thought bubble with ski -->
+          <circle cx="82" cy="14" r="3" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+          <circle cx="88" cy="9" r="4" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.8"/>
+          <ellipse cx="97" cy="5" rx="9" ry="7" fill="#EEEDFE" stroke="#7F77DD" stroke-width="1"/>
+          <path d="M90 5 Q93 2 97 5 Q101 2 104 5" stroke="#7F77DD" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <!-- 70% weight label -->
+          <rect x="18" y="95" width="24" height="12" rx="4" fill="#ddf5ec"/>
+          <text x="30" y="105" text-anchor="middle" font-size="8" fill="#0a6644" font-family="sans-serif" font-weight="bold">70%</text>
+        </svg>
+        <div style="font-size:12px;color:#3d5068;line-height:1.7;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--slope);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em;">Opis stava</div>
+          <b style="color:var(--slope);">Pozicija:</b> Skijaški polučučanj, oči zatvorene. Duboko disanje — ramena dole, vilica opuštena.<br>
+          <b style="color:#2dc89a;font-weight:600;">Lijeva noga (zelena)</b>: U vizualizaciji preuzima 70% težine. Osjeti je kao aktivnu, angažiranu nogu.<br>
+          <b style="color:#7F77DD;font-weight:600;">Oblačić misli</b>: Zamišljaš padinu, snijeg, zavoj. Mozak aktivira iste neuralne puteve kao da stvarno skijas.<br>
+          <b style="color:var(--slope);">Trajanje:</b> 5 lijevih zavoja po seriji, polako i detaljno — ne žuri kroz vizualizaciju.
+        </div>
+      </div>
+
+      <ul class="ex-steps">
+        <li><strong>Postavljanje:</strong> Stani u skijaški stav, zatvori oči. Udahni duboko 3 puta — opusti ramena i vilicu.</li>
+        <li><strong>Zamisli padinu:</strong> Vidiš se kako stojiš na stazi. Kreneš u <strong>lijevi zavoj</strong> — svjesno prebaci 70% težine na lijevu nogu <em>prije</em> ulaska u zavoj.</li>
+        <li><strong>Osjeti detalje:</strong> Potkolenica pritišće jezik pancerice. Prsti lijeve noge zagrizaju u snijeg. Skiju osjećaš pod cijelim lijevim stopalom.</li>
+        <li><strong>Ponavljaj:</strong> 5 zamišljenih lijevih zavoja po seriji. <span class="hl">Svaki zamišljeni zavoj = pravi neuralni trening — mozak ne pravi razliku</span></li>
+        <li><strong>Cilj:</strong> 2 serije × 60 sekundi — idealna završnica svakog treninga.</li>
+      </ul>
+      <div class="ex-why">
+        <strong>Zašto ovo radi:</strong> Istraživanja potvrđuju da vizualizacija aktivira iste neuralne puteve kao fizičko izvođenje pokreta. Mozak gradi iste sinaptičke veze. Posebno je moćno za korekciju asimetričnih pokreta poput pasivne lijeve noge — mozak "zaključava" naučene obrasce iz fizičkog treninga.
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESSION PLAN -->
+  <div style="margin-bottom:20px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--warm);margin-bottom:12px;display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:20px;height:2px;background:var(--warm);"></span>Plan napredovanja</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
+      <div style="background:white;border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:10px;padding:14px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--accent);line-height:1;">Sedm. 1–2</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--slope);margin:6px 0 4px;text-transform:uppercase;letter-spacing:.03em;">Temelj</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">Samo <strong style="color:var(--text);">Blok 1 + Blok 2</strong>. Tijelo se navikava. Ne žuri — kvalitet je ispred količine.</div>
+      </div>
+      <div style="background:white;border:1px solid var(--border);border-top:3px solid var(--accent2);border-radius:10px;padding:14px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--accent2);line-height:1;">Sedm. 3–4</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--slope);margin:6px 0 4px;text-transform:uppercase;letter-spacing:.03em;">Prioritet</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">Dodaj <strong style="color:var(--text);">Blok 3</strong> — balans + mini čučanj na lijevoj. Ovo je srž programa.</div>
+      </div>
+      <div style="background:white;border:1px solid var(--border);border-top:3px solid var(--warm);border-radius:10px;padding:14px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--warm);line-height:1;">Sedm. 5–6</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--slope);margin:6px 0 4px;text-transform:uppercase;letter-spacing:.03em;">Puni program</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">Sva <strong style="color:var(--text);">4 bloka</strong>, 3× sedmično. Angulacija kukova + vizualizacija postaju rutina.</div>
+      </div>
+    </div>
+
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:20px;height:2px;background:var(--accent);"></span>Na snijegu — praktični savjeti</div>
+    <div style="background:white;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;">
+        <div style="background:#e6f1fb;border-radius:50%;min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin-top:1px;font-size:14px;">🎿</div>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--slope);margin-bottom:3px;">Prva vožnja — 10 svjesnih lijevih zavoja</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65;">Na prvom spustu napravi 10 lijevih zavoja gdje <strong style="color:var(--text);">svjesno kažeš sebi "70% na lijevu" prije ulaska</strong> u zavoj — ne tokom, nego prije. Taj rani prenos težine je ključna razlika. Počni na laganoj stazi.</div>
+        </div>
+      </div>
+
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;">
+        <div style="background:#e1f5ee;border-radius:50%;min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin-top:1px;font-size:14px;">👍</div>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--slope);margin-bottom:3px;">Pritisni palac lijeve noge u skiju</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65;">Kad krećeš u desni zavoj, svjesno pritisni <strong style="color:var(--text);">palac lijeve noge prema skiji</strong>. Ovaj signal prisiljava lijevu nogu da preuzme težinu i prati putanju — bez podizanja.</div>
+        </div>
+      </div>
+
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;">
+        <div style="background:#fdefd5;border-radius:50%;min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin-top:1px;font-size:14px;">🔒</div>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--slope);margin-bottom:3px;">Zategni gornje kopče pancerice</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65;">Labava pancerica je "tihi ubica" kontrole. Svaki put <strong style="color:var(--text);">zategni gornje kopče za jedan zubac više</strong> i čičak traku (power strap) maksimalno. Svaki milimetar lufta = kašnjenje skije.</div>
+        </div>
+      </div>
+
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;">
+        <div style="background:#fde8e8;border-radius:50%;min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin-top:1px;font-size:14px;">🏔</div>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--slope);margin-bottom:3px;">Skupi noge na neuređenom terenu</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65;">Na dubokom snijegu i šumi drži skije <strong style="color:var(--text);">bliže jedna drugoj</strong> — djeluju kao jedna platforma. Što su skije bliže, adduktori lakše drže vanjsku nogu aktivnom i jastuk između koljena "ne ispada".</div>
+        </div>
+      </div>
+
+      <div style="padding:14px 16px;display:flex;gap:14px;align-items:flex-start;">
+        <div style="background:#eeedfe;border-radius:50%;min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin-top:1px;font-size:14px;">👁</div>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--slope);margin-bottom:3px;">Gledaj dalje ispred sebe</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65;">Ne gledaj u vrhove skija. U šumi gledaj <strong style="color:var(--text);">prostor između drveća gdje želiš proći</strong> — tijelo prirodno slijedi pogled i automatski inicira prenos težine na vanjsku nogu.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-box">
+    <div class="footer-title">Očekivani <span>rezultati</span></div>
+    <div class="f-item"><div class="f-val">2 sedm.</div><div class="f-lbl">Bolja propriocepcija lijeve noge</div></div>
+    <div class="f-item"><div class="f-val">4 sedm.</div><div class="f-lbl">Lijeva noga prestaje biti pasivna</div></div>
+    <div class="f-item"><div class="f-val">6 sedm.</div><div class="f-lbl">Paralelni stav u lijevim zavojima</div></div>
+    <div class="f-item"><div class="f-val">3×/sedm.</div><div class="f-lbl">Minimalna frekvencija treninga</div></div>
+    <ul class="result-list">
+      <li>Lijeva skija prati desnu bez podizanja</li>
+      <li>Automatski prenos težine 70% na vanjsku nogu</li>
+      <li>Prestanak "backseat" položaja — potkolenica na jeziku pancerice</li>
+      <li>Paralelni stav i na sporim, uskim dijelovima staze</li>
+    </ul>
+  </div>
+
+</div>
+<script>
+function toggle(card){
+  const body=card.querySelector('.ex-body');
+  const open=body.classList.contains('open');
+  document.querySelectorAll('.ex-body.open').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.ex-card.open').forEach(c=>c.classList.remove('open'));
+  if(!open){body.classList.add('open');card.classList.add('open');}
+}
+</script>
+</body>
+</html>
