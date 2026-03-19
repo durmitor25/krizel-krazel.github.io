@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scraper Projekat — Dokumentacija</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #1a1d2e;
+    --bg3: #232740;
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --accent4: #ffd93d;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --border: #2d3748;
+    --code-bg: #0d1117;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1a1d2e 0%, #232740 50%, #1a1d2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at center, rgba(108,99,255,0.08) 0%, transparent 70%);
+  }
+  header h1 {
+    font-size: 2.4rem; font-weight: 700;
+    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 8px;
+  }
+  header p { color: var(--text2); font-size: 1.05rem; }
+
+  nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; gap: 4px; overflow-x: auto;
+  }
+  nav a {
+    color: var(--text2); text-decoration: none;
+    padding: 14px 18px; font-size: 0.9rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px; }
+
+  section { margin-bottom: 60px; }
+  section h2 {
+    font-size: 1.5rem; color: var(--accent2);
+    margin-bottom: 24px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  section h3 { font-size: 1.1rem; margin: 24px 0 10px; color: var(--text); }
+
+  /* FLOW */
+  .flow {
+    display: flex; align-items: center; gap: 0;
+    flex-wrap: wrap; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 24px; margin-bottom: 16px;
+  }
+  .flow-step {
+    background: var(--bg3); border: 1px solid var(--accent);
+    border-radius: 8px; padding: 12px 16px;
+    text-align: center; min-width: 120px;
+  }
+  .flow-step .num { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .flow-step .label { font-size: 0.88rem; font-weight: 600; }
+  .flow-step .sub { font-size: 0.72rem; color: var(--text2); margin-top: 4px; }
+  .flow-arrow { color: var(--accent); font-size: 1.4rem; padding: 0 6px; }
+
+  /* TREE */
+  .tree {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px 28px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.88rem; line-height: 2.1;
+  }
+  .tree .folder { color: var(--accent4); font-weight: 600; }
+  .tree .file-main { color: var(--accent2); font-weight: 600; }
+  .tree .file { color: var(--text2); }
+  .tree .cm { color: #4a5568; font-style: italic; }
+
+  /* STEP CARDS */
+  .steps { display: flex; flex-direction: column; gap: 16px; }
+  .step-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    display: flex; align-items: stretch;
+  }
+  .step-num {
+    background: var(--bg3); min-width: 56px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; font-weight: 800; color: var(--accent);
+    border-right: 1px solid var(--border);
+  }
+  .step-body { padding: 16px 20px; flex: 1; }
+  .step-body h4 { font-size: 1rem; margin-bottom: 6px; color: var(--accent2); }
+  .step-body p { font-size: 0.88rem; color: var(--text2); margin-bottom: 8px; }
+  .step-body .note {
+    background: rgba(108,99,255,0.08); border-left: 3px solid var(--accent);
+    padding: 8px 12px; border-radius: 0 6px 6px 0;
+    font-size: 0.82rem; color: var(--text2); margin-top: 8px;
+  }
+
+  /* FILE CARDS */
+  .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+  .file-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .file-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .file-card-header {
+    padding: 14px 18px; display: flex; align-items: center;
+    gap: 12px; border-bottom: 1px solid var(--border);
+  }
+  .file-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .file-card-header h3 { font-size: 0.92rem; font-weight: 600; }
+  .file-card-header .path { font-size: 0.72rem; color: var(--text2); font-family: monospace; }
+  .file-card-body { padding: 14px 18px; }
+  .file-card-body p { font-size: 0.85rem; color: var(--text2); margin-bottom: 10px; }
+
+  /* BADGES */
+  .badge {
+    display: inline-block; font-size: 0.7rem;
+    padding: 3px 9px; border-radius: 20px;
+    font-weight: 600; margin-right: 5px; margin-bottom: 5px;
+  }
+  .bg { background: rgba(0,212,170,0.12); color: var(--accent2); border: 1px solid rgba(0,212,170,0.25); }
+  .bp { background: rgba(108,99,255,0.12); color: var(--accent); border: 1px solid rgba(108,99,255,0.25); }
+  .br { background: rgba(255,107,107,0.12); color: var(--accent3); border: 1px solid rgba(255,107,107,0.25); }
+  .by { background: rgba(255,217,61,0.12); color: var(--accent4); border: 1px solid rgba(255,217,61,0.25); }
+
+  /* CODE */
+  .code {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-family: 'Cascadia Code','Consolas', monospace;
+    font-size: 0.8rem; line-height: 1.75; overflow-x: auto; margin: 10px 0;
+  }
+  .kw { color: #ff79c6; } .fn { color: #50fa7b; }
+  .st { color: #f1fa8c; } .cm { color: #6272a4; font-style: italic; }
+  .vr { color: #8be9fd; }
+
+  /* HANDLER TABLE */
+  .htable { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .htable th {
+    background: var(--bg3); padding: 11px 14px; text-align: left;
+    font-size: 0.78rem; color: var(--accent2); text-transform: uppercase;
+    letter-spacing: 0.5px; border-bottom: 2px solid var(--border);
+  }
+  .htable td {
+    padding: 11px 14px; font-size: 0.85rem;
+    border-bottom: 1px solid var(--border); vertical-align: top;
+  }
+  .htable tr:last-child td { border-bottom: none; }
+  .htable tr:hover td { background: rgba(108,99,255,0.04); }
+  .htable td:first-child { font-family: monospace; color: var(--accent); font-weight: 600; }
+
+  /* DB TABLE */
+  .dbtable { width: 100%; border-collapse: collapse; background: var(--bg2); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .dbtable th { background: var(--bg3); padding: 10px 14px; text-align: left; font-size: 0.78rem; color: var(--accent2); text-transform: uppercase; }
+  .dbtable td { padding: 10px 14px; font-size: 0.83rem; border-top: 1px solid var(--border); font-family: monospace; }
+  .dbtable td.new { color: var(--accent4); }
+  .dbtable td.desc { font-family: 'Segoe UI', sans-serif; color: var(--text2); }
+
+  /* INFO BOX */
+  .info { background: rgba(108,99,255,0.07); border: 1px solid rgba(108,99,255,0.25); border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-size: 0.87rem; }
+  .info.ok { background: rgba(0,212,170,0.07); border-color: rgba(0,212,170,0.25); }
+  .info.warn { background: rgba(255,217,61,0.07); border-color: rgba(255,217,61,0.25); }
+  .info strong { display: block; margin-bottom: 5px; }
+
+  /* SUMMARY PREVIEW */
+  .summary-preview {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px;
+    font-family: 'Cascadia Code','Consolas', monospace; font-size: 0.8rem; line-height: 1.9;
+  }
+  .s-ok { color: var(--accent2); }
+  .s-err { color: var(--accent3); }
+  .s-head { color: var(--accent4); }
+  .s-div { color: #4a5568; }
+
+  /* AIRFLOW */
+  .dag-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .dag-tasks { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin-top: 16px; }
+  .dag-task { background: var(--bg3); border: 1px solid var(--accent); border-radius: 8px; padding: 14px 18px; text-align: center; min-width: 130px; }
+  .dag-task .t-num { font-size: 0.68rem; color: var(--accent); margin-bottom: 4px; }
+  .dag-task .t-name { font-weight: 700; font-size: 0.9rem; }
+  .dag-task .t-fn { font-size: 0.72rem; color: var(--text2); font-family: monospace; margin-top: 4px; }
+  .dag-arrow { color: var(--accent2); font-size: 1.5rem; padding: 0 6px; }
+
+  footer { text-align: center; padding: 40px; color: var(--text2); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🕷️ Scraper Projekat</h1>
+  <p>Dokumentacija arhitekture i koda — automatsko preuzimanje podataka sa web izvora</p>
+</header>
+
+<nav>
+  <a href="#kako-radi">Kako radi</a>
+  <a href="#struktura">Struktura</a>
+  <a href="#fajlovi">Fajlovi</a>
+  <a href="#handleri">Handleri</a>
+  <a href="#summary">Summary log</a>
+  <a href="#baza">Baza</a>
+  <a href="#airflow">Airflow</a>
+  <a href="#novi-izvor">Novi izvor</a>
+</nav>
+
+<div class="container">
+
+  <!-- KAKO RADI -->
+  <section id="kako-radi">
+    <h2>⚡ Kako radi — korak po korak</h2>
+
+    <p style="color:var(--text2); margin-bottom:20px;">Kada pokrneš <code>python main.py</code>, dešava se sljedeće:</p>
+
+    <div class="steps">
+
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Čitanje konfiguracije iz baze</h4>
+          <p><code>configdb.py</code> se spoji na PostgreSQL bazu i pročita dvije tabele: <strong>scraping</strong> (lista svih izvora — SURS, ZPIZ, GURS, PK) i <strong>output_path</strong> (putanje foldera na disku gdje se snimaju fajlovi). Automatski spoji ove dvije tabele — svaki izvor dobije stvarnu putanju foldera.</p>
+          <div class="note">💡 Ako dodaš novi izvor u tabelu <strong>scraping</strong>, sistem ga automatski vidi pri sljedećem pokretanju — bez ikakvog mijenjanja koda.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Prolaz kroz sve aktivne izvore</h4>
+          <p><code>main.py</code> prođe kroz svaki red iz tabele <strong>scraping</strong>. Ako je red označen kao <code>enabled = false</code>, preskoči ga. Za svaki aktivan red pozove <strong>registry</strong> koji odlučuje kako da preuzme fajl.</p>
+          <div class="note">💡 Možeš privremeno isključiti bilo koji izvor u bazi postavljanjem <code>enabled = false</code> — bez brisanja reda.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Registry bira pravi handler</h4>
+          <p><code>handlers/__init__.py</code> gleda kolonu <code>handler</code> u tom redu i bira odgovarajuću funkciju. Na primjer ako piše <code>direct</code> — pozove <code>direct.py</code>, ako piše <code>api_then_dl</code> — pozove <code>api_then_dl.py</code>. Ovo se zove <strong>registry pattern</strong> — kao telefonski imenik, tražiš po imenu i dobiješ broj.</p>
+          <div class="note">💡 Ako handler nije prepoznat (npr. neko unese pogrešan naziv) — sistem logovira SKIP i nastavlja dalje. Ne pada, ne staje.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Handler preuzima fajl</h4>
+          <p>Svaki handler radi istu stvar ali na drugačiji način — gradi URL, šalje HTTP request, prima sadržaj i snima ga na disk. Veličina fajla se mjeri odmah. Rezultat (OK ili ERROR) se vraća nazad u <code>main.py</code>.</p>
+          <div class="note">💡 Greška na jednom fajlu ne prekida ostale. Sistem nastavi sa sljedećim izvorom i na kraju prikaže rezime.</div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Fajl se snima u LANDING folder</h4>
+          <p>Preuzeti fajl se snima u odgovarajući LANDING subfolder. Naziv fajla se uvijek gradi po istoj konvenciji: <code>MMYYYY_IZVOR_ID.ekstenzija</code>. Na primjer: <code>032026_SURS_05A1002S.px</code>. Folder se kreira automatski ako ne postoji.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h4>Summary rezime na kraju</h4>
+          <p>Nakon što svi izvori budu obrađeni, <code>main.py</code> ispiše rezime u log fajl i terminal. Vidiš svaki fajl — da li je OK ili ERROR — i kolika mu je veličina. Na dnu je ukupan broj uspješnih i neuspješnih preuzimanja.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <h4>Unzip → Convert → Check (opciono)</h4>
+          <p>Ovi koraci se pokreću odvojeno (ručno ili kroz Airflow). <code>unzipper.py</code> raspakuje ZIP fajlove iz LANDING u BRONZE. <code>converters/</code> konvertuje .px i .json u Parquet format. <code>check.py</code> pregleda log i javlja ako ima grešaka.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:28px;">
+      <h3 style="margin-bottom:12px;">Vizualni tok</h3>
+      <div class="flow">
+        <div class="flow-step"><div class="num">1</div><div class="label">Baza (DB)</div><div class="sub">čitaj izvore</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="num">2</div><div class="label">main.py</div><div class="sub">loop kroz izvore</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="num">3</div><div class="label">Registry</div><div class="sub">bira handler</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="num">4</div><div class="label">Handler</div><div class="sub">preuzima fajl</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="num">5</div><div class="label">LANDING</div><div class="sub">snimi na disk</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="num">6</div><div class="label">Summary</div><div class="sub">rezime u log</div></div>
+      </div>
+      <div class="flow">
+        <div class="flow-step"><div class="num">7a</div><div class="label">unzipper.py</div><div class="sub">ZIP → BRONZE</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="num">7b</div><div class="label">converters</div><div class="sub">px/json → parquet</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="num">7c</div><div class="label">BRONZE</div><div class="sub">parquet fajlovi</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="num">7d</div><div class="label">check.py</div><div class="sub">provjera grešaka</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STRUKTURA -->
+  <section id="struktura">
+    <h2>📁 Struktura projekta</h2>
+    <div class="tree">
+      <span class="folder">scraper_project/</span><br>
+      &nbsp;&nbsp;├── <span class="folder">config/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># konekcija i čitanje iz baze</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── __init__.py&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># prazan — označava Python paket</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file-main">configdb.py</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># čita scraping + output_path tabelu</span><br>
+      &nbsp;&nbsp;│<br>
+      &nbsp;&nbsp;├── <span class="folder">handlers/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># kako se preuzima svaki tip fajla</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file-main">__init__.py</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># REGISTRY — dispatcher, bira handler</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">direct.py</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># url + file_id → SURS</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">direct_ext.py</span>&nbsp;&nbsp;<span class="cm"># url + file_id + .ext → ZPIZ, PK</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">direct_full.py</span>&nbsp;<span class="cm"># url kompletan → GURS json</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">api_then_dl.py</span>&nbsp;<span class="cm"># API meta → download → GURS zip</span><br>
+      &nbsp;&nbsp;│<br>
+      &nbsp;&nbsp;├── <span class="folder">utils/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># pomoćne funkcije</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── __init__.py<br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">logger.py</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># logging u fajl i terminal</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">file_utils.py</span>&nbsp;&nbsp;<span class="cm"># build_filename + save_file helper</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">unzipper.py</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># raspakivanje ZIP → BRONZE</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">check.py</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># provjera loga za greške</span><br>
+      &nbsp;&nbsp;│<br>
+      &nbsp;&nbsp;├── <span class="folder">converters/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># konverzija fajlova u parquet</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file-main">__init__.py</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># convert_all() — pokreće obje konverzije</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">px_converter.py</span><span class="cm"># .px → .parquet (SURS)</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">json_converter.py</span><span class="cm"># .json → .parquet (GURS)</span><br>
+      &nbsp;&nbsp;│<br>
+      &nbsp;&nbsp;├── <span class="folder">dags/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># Airflow automatizacija</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">scraper_dag.py</span>&nbsp;<span class="cm"># DAG definicija (kad budeš spreman)</span><br>
+      &nbsp;&nbsp;│<br>
+      &nbsp;&nbsp;└── <span class="file-main">main.py</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># ← OVAJ FAJL POKREĆEŠ: python main.py</span>
+    </div>
+  </section>
+
+  <!-- FAJLOVI -->
+  <section id="fajlovi">
+    <h2>📄 Opis fajlova</h2>
+    <div class="file-grid">
+
+      <div class="file-card">
+        <div class="file-card-header">
+          <div class="file-icon" style="background:rgba(0,212,170,0.15)">🚀</div>
+          <div><h3>main.py</h3><div class="path">scraper_project/main.py</div></div>
+        </div>
+        <div class="file-card-body">
+          <p>Jedini fajl koji ti pokrećeš. Čita config iz baze, prolazi kroz sve aktivne izvore, poziva registry, sakuplja rezultate i na kraju ispisuje summary rezime u log fajl.</p>
+          <span class="badge bg">Entry Point</span>
+          <span class="badge bp">Nikad se ne mijenja</span>
+          <div class="code">
+<span class="kw">for</span> row <span class="kw">in</span> sources:<br>
+&nbsp;&nbsp;result = <span class="fn">run</span>(row)<br>
+&nbsp;&nbsp;results.append(result)<br>
+<span class="fn">write_summary</span>(results, log_path)
+          </div>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="file-card-header">
+          <div class="file-icon" style="background:rgba(108,99,255,0.15)">🗄️</div>
+          <div><h3>configdb.py</h3><div class="path">config/configdb.py</div></div>
+        </div>
+        <div class="file-card-body">
+          <p>Spaja se na PostgreSQL i čita tabelu <strong>scraping</strong> i tabelu <strong>output_path</strong>. Automatski zamijeni key putanje sa stvarnom putanjom — svaki izvor dobije kompletan output_dir.</p>
+          <span class="badge bp">PostgreSQL</span>
+          <span class="badge by">psycopg2</span>
+          <div class="code">
+<span class="cm"># 'o_landing_surs' automatski postaje:</span><br>
+<span class="cm"># 'C:\Scraping\LANDING\SURS'</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="file-card-header">
+          <div class="file-icon" style="background:rgba(255,217,61,0.15)">🔀</div>
+          <div><h3>handlers/__init__.py</h3><div class="path">handlers/__init__.py — Registry</div></div>
+        </div>
+        <div class="file-card-body">
+          <p>Telefonski imenik handlera. Gleda kolonu <code>handler</code> iz baze i poziva odgovarajuću funkciju. Ako handler nije poznat — loguje SKIP i nastavlja dalje bez pada.</p>
+          <span class="badge bg">Registry Pattern</span>
+          <div class="code">
+REGISTRY = {<br>
+&nbsp;&nbsp;<span class="st">'direct'</span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;direct,<br>
+&nbsp;&nbsp;<span class="st">'direct_ext'</span>: direct_ext,<br>
+&nbsp;&nbsp;<span class="st">'direct_full'</span>:direct_full,<br>
+&nbsp;&nbsp;<span class="st">'api_then_dl'</span>:api_then_dl,<br>
+}
+          </div>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="file-card-header">
+          <div class="file-icon" style="background:rgba(0,212,170,0.15)">📝</div>
+          <div><h3>logger.py</h3><div class="path">utils/logger.py</div></div>
+        </div>
+        <div class="file-card-body">
+          <p>Upravlja logovanjem. <code>setup_logging()</code> se poziva jednom na početku i otvori log fajl. <code>f_log()</code> se poziva svuda u projektu — piše u fajl i ispisuje u terminal istovremeno.</p>
+          <span class="badge bg">Singleton</span>
+          <div class="code">
+<span class="fn">f_log</span>(<span class="st">"[OK] Downloaded"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;level=<span class="st">"info"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;section=<span class="st">"DIRECT"</span>)
+          </div>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="file-card-header">
+          <div class="file-icon" style="background:rgba(108,99,255,0.15)">💾</div>
+          <div><h3>file_utils.py</h3><div class="path">utils/file_utils.py</div></div>
+        </div>
+        <div class="file-card-body">
+          <p>Zajednički helper kojeg svi handleri koriste. <code>build_filename()</code> gradi naziv fajla po konvenciji. <code>save_file()</code> snima na disk i kreira folder ako ne postoji.</p>
+          <span class="badge bp">Helper</span>
+          <div class="code">
+<span class="cm"># Konvencija naziva:</span><br>
+<span class="cm"># MMYYYY_IZVOR_ID.EXT</span><br>
+<span class="cm"># → 032026_SURS_05A1002S.px</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="file-card-header">
+          <div class="file-icon" style="background:rgba(255,107,107,0.15)">📦</div>
+          <div><h3>unzipper.py</h3><div class="path">utils/unzipper.py</div></div>
+        </div>
+        <div class="file-card-body">
+          <p>Raspakuje sve ZIP fajlove iz LANDING zone u BRONZE zonu. Svaki ZIP dobije vlastiti subfolder. Mapiranje landing→bronze je u <code>UNZIP_MAP</code> dict-u — kad dodaš novi ZIP izvor, dodaš jedan par tu.</p>
+          <span class="badge by">ZIP → BRONZE</span>
+          <div class="code">
+UNZIP_MAP = {<br>
+&nbsp;&nbsp;<span class="st">'o_landing_gurs_z'</span>: <span class="st">'o_bronze_gurs'</span>,<br>
+&nbsp;&nbsp;<span class="st">'o_landing_pk'</span>: <span class="st">'o_bronze_pk'</span>,<br>
+}
+          </div>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="file-card-header">
+          <div class="file-icon" style="background:rgba(0,212,170,0.15)">✅</div>
+          <div><h3>check.py</h3><div class="path">utils/check.py</div></div>
+        </div>
+        <div class="file-card-body">
+          <p>Čita log fajl i traži WARNING i ERROR poruke iz današnjeg runa. Vraća <code>True</code> ako je sve OK. Sa parametrom <code>raise_on_error=True</code> baci Exception — korisno za Airflow da označi task kao failed.</p>
+          <span class="badge br">Error Detection</span>
+          <span class="badge bp">Airflow ready</span>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="file-card-header">
+          <div class="file-icon" style="background:rgba(255,217,61,0.15)">🔄</div>
+          <div><h3>px_converter.py</h3><div class="path">converters/px_converter.py</div></div>
+        </div>
+        <div class="file-card-body">
+          <p>Konvertuje sve <code>.px</code> fajlove iz LANDING/SURS u Parquet format u BRONZE/SURS. Greška na jednom fajlu ne prekida ostale — na kraju prikaže summary koliko je uspješno.</p>
+          <span class="badge bg">.px → .parquet</span>
+          <span class="badge bp">pyaxis</span>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="file-card-header">
+          <div class="file-icon" style="background:rgba(255,217,61,0.15)">🔄</div>
+          <div><h3>json_converter.py</h3><div class="path">converters/json_converter.py</div></div>
+        </div>
+        <div class="file-card-body">
+          <p>Konvertuje sve <code>.json</code> fajlove iz LANDING/GURS/json u Parquet. Koristi <code>pd.json_normalize(data['features'])</code> jer GURS vraća GeoJSON format sa <code>features</code> nizom unutra.</p>
+          <span class="badge bg">.json → .parquet</span>
+          <span class="badge bp">pandas</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HANDLERI -->
+  <section id="handleri">
+    <h2>🔧 Handleri — tipovi preuzimanja</h2>
+    <p style="color:var(--text2); margin-bottom:20px;">Svaki handler prima isti <code>row</code> dict iz baze i vraća rezultat. Jedina razlika je kako se gradi URL i kako se preuzima fajl.</p>
+
+    <table class="htable">
+      <thead>
+        <tr>
+          <th>Handler</th>
+          <th>URL logika</th>
+          <th>Koristi se za</th>
+          <th>Posebnosti</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>direct</td>
+          <td>url + file_id</td>
+          <td>SURS (.px fajlovi)</td>
+          <td>Najjednostavniji — direktan GET request</td>
+        </tr>
+        <tr>
+          <td>direct_ext</td>
+          <td>url + file_id + "." + type_file</td>
+          <td>ZPIZ (.xlsx), PK (.zip)</td>
+          <td>Isti kao direct, samo dodaje ekstenziju na kraj URL-a</td>
+        </tr>
+        <tr>
+          <td>direct_full</td>
+          <td>url (kompletan, ništa se ne dodaje)</td>
+          <td>GURS (.json fajlovi)</td>
+          <td>file_id se ne dodaje na URL — koristi se samo za naziv fajla na disku. JSON se snima kao tekst (UTF-8)</td>
+        </tr>
+        <tr>
+          <td>api_then_dl</td>
+          <td>2 koraka: META API poziv → dobij pravi URL → preuzmi</td>
+          <td>GURS (.zip arhive)</td>
+          <td>Korak 1: GET na API sa api_params iz baze → response JSON sadrži "url" polje. Korak 2: streaming download ZIP fajla sa tog URL-a</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info" style="margin-top:20px;">
+      <strong>💡 Kada dođe novi tip izvora koji ne odgovara ni jednom handleru:</strong>
+      1. Kreiraj <code>handlers/novi_handler.py</code> sa <code>download(row) -> dict</code> funkcijom<br>
+      2. U <code>handlers/__init__.py</code> dodaj import i jedan red u REGISTRY dict<br>
+      3. <strong>main.py se ne mijenja!</strong>
+    </div>
+  </section>
+
+  <!-- SUMMARY LOG -->
+  <section id="summary">
+    <h2>📊 Summary rezime u log fajlu</h2>
+    <p style="color:var(--text2); margin-bottom:16px;">Nakon svakog pokretanja, na dno log fajla se doda ovakav rezime:</p>
+
+    <div class="summary-preview">
+<span class="s-div">======================================================================</span><br>
+<span class="s-head">  DOWNLOAD SUMMARY — 19.03.2026 14:32</span><br>
+<span class="s-div">======================================================================</span><br>
+<span class="s-head">  STATUS   IZVOR      FAJL                                                 VELICINA</span><br>
+<span class="s-div">----------------------------------------------------------------------</span><br>
+<span class="s-ok">  OK       GURS       032026_GURS_Podatki iz evidence trga nepremicnin.zip    45.2 MB</span><br>
+<span class="s-ok">  OK       GURS       032026_GURS_Podatki iz evidence vrednotenja.zip         12.8 MB</span><br>
+<span class="s-err">  ERROR    SURS       032026_SURS_05A1002S.px                                       -</span><br>
+<span class="s-err">  ERROR    SURS       032026_SURS_05C4003S.px                                       -</span><br>
+<span class="s-err">  ERROR    PK         032026_PK_DRSV_IKRPN_PP.zip                                   -</span><br>
+<span class="s-err">  ERROR    ZPIZ       032026_ZPIZ_MSP_2025_10.xlsx                                   -</span><br>
+<span class="s-div">----------------------------------------------------------------------</span><br>
+<span class="s-head">  Ukupno: 20 | OK: 2 | ERROR: 17 | SKIP: 0</span><br>
+<span class="s-div">======================================================================</span>
+    </div>
+
+    <div class="info ok" style="margin-top:16px;">
+      <strong>✅ Šta znači svaki status:</strong>
+      <strong>OK</strong> — fajl uspješno preuzet, vidljiva je i veličina u MB<br>
+      <strong>ERROR</strong> — preuzimanje nije uspjelo (DNS problem, server nedostupan, prazan fajl...)<br>
+      <strong>SKIP</strong> — handler nije prepoznat ili red je disabled u bazi
+    </div>
+
+    <div class="info warn" style="margin-top:12px;">
+      <strong>⚠️ Greške koje smo vidjeli u testu (DNS/mrežni problem):</strong>
+      Python ne može pristupiti određenim domenama jer korporativna mreža koristi proxy. Browser radi jer automatski koristi proxy, Python ne. Rješenje: provjeriti proxy postavke i dodati ih u Python kod.
+    </div>
+  </section>
+
+  <!-- BAZA -->
+  <section id="baza">
+    <h2>🗄️ Baza podataka</h2>
+
+    <h3>Tabela: <span style="color:var(--accent4)">scraping</span></h3>
+    <table class="dbtable">
+      <thead><tr><th>Kolona</th><th>Tip</th><th>Opis</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>id</td><td>serial4</td><td class="desc">Auto ID</td><td></td></tr>
+        <tr><td>source_id</td><td>serial4</td><td class="desc">ID grupe izvora (1=SURS, 2=ZPIZ, 3=GURS, 4=PK)</td><td></td></tr>
+        <tr><td>source_name</td><td>text</td><td class="desc">Naziv izvora</td><td></td></tr>
+        <tr><td>url</td><td>text</td><td class="desc">Base URL ili kompletan URL</td><td></td></tr>
+        <tr><td>file_id</td><td>text</td><td class="desc">ID fajla — dodaje se na URL ili samo za naziv</td><td></td></tr>
+        <tr><td>type_file</td><td>text</td><td class="desc">Ekstenzija: px, xlsx, json, zip</td><td></td></tr>
+        <tr><td>description</td><td>text</td><td class="desc">Opis dataseta</td><td></td></tr>
+        <tr><td>enabled</td><td>bool</td><td class="desc">Da li je izvor aktivan</td><td></td></tr>
+        <tr><td class="new">handler</td><td>text</td><td class="desc">Tip preuzimanja: direct / direct_ext / direct_full / api_then_dl</td><td><span class="badge by">NOVO</span></td></tr>
+        <tr><td class="new">output_dir</td><td>text</td><td class="desc">Key iz output_path tabele, npr. o_landing_surs</td><td><span class="badge by">NOVO</span></td></tr>
+        <tr><td class="new">verify_ssl</td><td>bool</td><td class="desc">Da li provjeravati SSL certifikat (false za GURS json, PK)</td><td><span class="badge by">NOVO</span></td></tr>
+        <tr><td class="new">api_params</td><td>jsonb</td><td class="desc">JSON parametri za api_then_dl handler, npr. {"filterParam":"DRZAVA"}</td><td><span class="badge by">NOVO</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:28px;">Tabela: <span style="color:var(--accent4)">output_path</span></h3>
+    <table class="dbtable">
+      <thead><tr><th>Key</th><th>Vrijednost</th></tr></thead>
+      <tbody>
+        <tr><td>o_landing_surs</td><td class="desc">C:\WebRequest\Scraping\LANDING\SURS</td></tr>
+        <tr><td>o_landing_gurs_j</td><td class="desc">C:\WebRequest\Scraping\LANDING\GURS\json</td></tr>
+        <tr><td>o_landing_gurs_z</td><td class="desc">C:\WebRequest\Scraping\LANDING\GURS\zip</td></tr>
+        <tr><td>o_landing_zpiz</td><td class="desc">C:\WebRequest\Scraping\LANDING\ZPIZ</td></tr>
+        <tr><td>o_landing_pk</td><td class="desc">C:\WebRequest\Scraping\LANDING\PK</td></tr>
+        <tr><td>o_bronze_surs</td><td class="desc">C:\WebRequest\Scraping\BRONZE\SURS</td></tr>
+        <tr><td>o_bronze_gurs</td><td class="desc">C:\WebRequest\Scraping\BRONZE\GURS</td></tr>
+        <tr><td>o_bronze_pk</td><td class="desc">C:\WebRequest\Scraping\BRONZE\PK</td></tr>
+        <tr><td>output_log</td><td class="desc">C:\WebRequest\Scraping\i_output.log</td></tr>
+      </tbody>
+    </table>
+
+    <div class="info" style="margin-top:14px;">
+      <strong>💡 Kako ove dvije tabele rade zajedno</strong>
+      Svaki red u <strong>scraping</strong> tabeli ima <code>output_dir = 'o_landing_surs'</code> (samo key, ne putanja).
+      <code>configdb.py</code> automatski zamijeni taj key sa stvarnom putanjom iz <strong>output_path</strong> tabele.
+      Ako se ikad promijeni lokacija foldera — mijenjаš samo jedan red u <strong>output_path</strong>, ništa drugo.
+    </div>
+  </section>
+
+  <!-- AIRFLOW -->
+  <section id="airflow">
+    <h2>✈️ Airflow pipeline</h2>
+    <div class="dag-box">
+      <p style="color:var(--text2); margin-bottom:4px;">DAG: <strong>data_scraper</strong> — automatski pokreće se svaki dan u 06:00</p>
+      <p style="color:var(--text2); font-size:0.83rem; margin-bottom:20px;">Fajl: <code>dags/scraper_dag.py</code> — stavi u Airflow dags/ folder kad budeš spreman. Trenutno pokrećeš ručno sa <code>python main.py</code>.</p>
+      <div class="dag-tasks">
+        <div class="dag-task"><div class="t-num">Task 1</div><div class="t-name">download_sources</div><div class="t-fn">run_downloads()</div></div>
+        <div class="dag-arrow">→</div>
+        <div class="dag-task"><div class="t-num">Task 2</div><div class="t-name">unzip_files</div><div class="t-fn">unzip_all()</div></div>
+        <div class="dag-arrow">→</div>
+        <div class="dag-task"><div class="t-num">Task 3</div><div class="t-name">convert_to_parquet</div><div class="t-fn">convert_all()</div></div>
+        <div class="dag-arrow">→</div>
+        <div class="dag-task"><div class="t-num">Task 4</div><div class="t-name">check_logs</div><div class="t-fn">check_logs()</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOVI IZVOR -->
+  <section id="novi-izvor">
+    <h2>➕ Kako dodati novi izvor</h2>
+
+    <p style="color:var(--text2); margin-bottom:24px;">
+      Sistem je dizajniran tako da dodavanje novog izvora <strong>ne zahtijeva mijenjanje koda</strong> — u većini slučajeva. 
+      Ispod su opisani svi mogući scenariji — šta može odmah, a šta treba developera.
+    </p>
+
+    <!-- MOŽE BEZ KODA -->
+    <h3 style="color:var(--accent2); margin-bottom:16px;">✅ Može bez ikakvog koda — samo uneseš red u bazu</h3>
+
+    <div class="steps">
+
+      <div class="step-card">
+        <div class="step-num" style="background:rgba(0,212,170,0.1); color:var(--accent2);">1</div>
+        <div class="step-body">
+          <h4>Direktan link na fajl (xlsx, csv, pdf, px...)</h4>
+          <p>Imaš URL koji kad otvoriš u browseru — fajl se odmah skida. Nema logina, nema klikanja. Samo klikneš link i fajl se preuzme.</p>
+          <p><strong>Primjer:</strong> <code>https://sko.gov.si/data/izvjestaj2025.xlsx</code></p>
+          <div class="note">
+            Koristi <strong>direct_ext</strong> ako URL ne sadrži ekstenziju:<br>
+            &nbsp;&nbsp;url = <code>https://sko.gov.si/data/</code> + file_id = <code>izvjestaj2025</code> + type_file = <code>xlsx</code><br><br>
+            Koristi <strong>direct_full</strong> ako je URL već kompletan sa ekstenzijom:<br>
+            &nbsp;&nbsp;url = <code>https://sko.gov.si/data/izvjestaj2025.xlsx</code> (file_id samo za naziv fajla)
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num" style="background:rgba(0,212,170,0.1); color:var(--accent2);">2</div>
+        <div class="step-body">
+          <h4>Direktan link ali server nema validan SSL certifikat</h4>
+          <p>Isti kao gore, ali browser ti možda prikaže upozorenje "Your connection is not private". Fajl se može skinuti, samo treba reći Pythonu da ignoriše SSL provjeru.</p>
+          <p><strong>Primjer:</strong> GURS json i PK fajlovi imaju ovaj problem.</p>
+          <div class="note">
+            Postavi <strong>verify_ssl = false</strong> u tabeli za taj red. Sve ostalo ostaje isto.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num" style="background:rgba(0,212,170,0.1); color:var(--accent2);">3</div>
+        <div class="step-body">
+          <h4>API koji vrati JSON sa download linkom unutra</h4>
+          <p>Zoveš jedan URL (API), on ti vrati JSON odgovor koji sadrži drugi URL — pravi link za download. Tek taj drugi link skineš. Može imati filtere kao parametre (godina, država...).</p>
+          <p><strong>Primjer:</strong> GURS zip fajlovi rade ovako.</p>
+          <div class="note">
+            Koristi <strong>api_then_dl</strong> handler.<br>
+            Filtere upiši u kolonu <strong>api_params</strong> kao JSON:<br>
+            <code>{"filterParam": "DRZAVA", "filterValue": 1, "filterYear": 2025}</code><br>
+            Ako nema filtera — ostavi api_params prazno (NULL).
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num" style="background:rgba(0,212,170,0.1); color:var(--accent2);">4</div>
+        <div class="step-body">
+          <h4>Isti tip fajla kao postojeći izvor ali drugi URL</h4>
+          <p>Npr. SURS ima novi dataset koji još nije u sistemu, ali radi identično kao ostali SURS fajlovi. Samo kopiraš pattern i promijeniš URL i file_id.</p>
+          <div class="note">
+            Pogledaj postojeće redove u bazi za isti source_name — koristi iste postavke, samo promijeni url, file_id i description.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TREBA DEVELOPERA -->
+    <h3 style="color:var(--accent3); margin: 32px 0 16px;">⚠️ Treba developera — novi handler u kodu</h3>
+    <p style="color:var(--text2); margin-bottom:16px;">
+      Sljedeći scenariji <strong>ne mogu raditi</strong> sa postojećim 4 handlera. Treba napisati novi handler fajl — što je posao developera, ali ne traje dugo (30-60 minuta).
+    </p>
+
+    <div class="steps">
+
+      <div class="step-card">
+        <div class="step-num" style="background:rgba(255,107,107,0.1); color:var(--accent3);">!</div>
+        <div class="step-body">
+          <h4>Login / autentikacija prije downloada</h4>
+          <p>Stranica zahtijeva da se prijaviš (username + password) prije nego možeš skinuti fajl. Browser pamti session, ali Python to ne radi automatski.</p>
+          <p><strong>Primjer:</strong> Portal koji traži prijavu, interni sistemi, privatni portali.</p>
+          <div class="note" style="border-left-color:var(--accent3);">
+            Treba novi handler koji koristi <code>requests.Session()</code> — prvo se prijavi, pa preuzme fajl. Developer napiše <code>handlers/session_dl.py</code>.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num" style="background:rgba(255,107,107,0.1); color:var(--accent3);">!</div>
+        <div class="step-body">
+          <h4>OAuth / API token autentikacija</h4>
+          <p>API zahtijeva Bearer token ili API ključ u headeru. Tipično za moderne API-je (GitHub, Google, razne državne platforme nove generacije).</p>
+          <p><strong>Primjer:</strong> <code>Authorization: Bearer eyJhbGc...</code> u HTTP headeru.</p>
+          <div class="note" style="border-left-color:var(--accent3);">
+            Treba novi handler koji dodaje Authorization header u request. Token se može čuvati u bazi ili u environment varijabli.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num" style="background:rgba(255,107,107,0.1); color:var(--accent3);">!</div>
+        <div class="step-body">
+          <h4>Stranica gdje treba kliknuti dugme da se pokrene download</h4>
+          <p>Fajl se ne skida direktno sa URL-a — treba otvoriti web stranicu, možda odabrati opcije iz dropdowna ili checkboxova, i tek onda kliknuti "Download". Ovo je tzv. web scraping sa interakcijom.</p>
+          <p><strong>Primjer:</strong> Portal gdje birate godinu iz padajućeg menija pa kliknete Export.</p>
+          <div class="note" style="border-left-color:var(--accent3);">
+            Treba Selenium ili Playwright biblioteka koja kontroliše browser. Ovo je složeniji handler — developer treba 2-4 sata.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num" style="background:rgba(255,107,107,0.1); color:var(--accent3);">!</div>
+        <div class="step-body">
+          <h4>FTP server</h4>
+          <p>Fajlovi su na FTP serveru (adresa počinje sa <code>ftp://</code>). Protokol je potpuno drugačiji od HTTP/HTTPS koji trenutni handleri koriste.</p>
+          <div class="note" style="border-left-color:var(--accent3);">
+            Treba novi handler koji koristi <code>ftplib</code> Python biblioteku. Relativno jednostavno za developera — oko 30 minuta.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num" style="background:rgba(255,107,107,0.1); color:var(--accent3);">!</div>
+        <div class="step-body">
+          <h4>URL koji sadrži dinamički datum</h4>
+          <p>URL se mijenja svaki dan/mjesec/godinu automatski. Na primjer svaki mjesec novi fajl ima datum u imenu i nema fiksni file_id.</p>
+          <p><strong>Primjer:</strong> <code>https://portal.gov.si/data/2026/03/report.xlsx</code> — sljedeći mjesec biće <code>/2026/04/</code></p>
+          <div class="note" style="border-left-color:var(--accent3);">
+            Treba novi handler koji gradi URL dinamički na osnovu trenutnog datuma. Može se riješiti i sa <code>api_params</code> ako API prihvata datum kao parametar.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- KAKO DODATI HANDLER -->
+    <div class="info warn" style="margin-top:28px;">
+      <strong>🔧 Kako developer dodaje novi handler (kratki vodič)</strong>
+      Kad dođe scenarij koji ne mogu pokriti postojeći handleri, developer uradi samo ovo:<br><br>
+      1. Kreira novi fajl <code>handlers/naziv_handlera.py</code> sa <code>download(row) → dict</code> funkcijom<br>
+      2. U <code>handlers/__init__.py</code> doda dvije linije — import i red u REGISTRY dict<br>
+      3. <strong>main.py, configdb.py i svi ostali fajlovi se NE mijenjaju</strong><br><br>
+      Nakon toga korisnik u bazi samo upiše novi naziv handlera u kolonu <code>handler</code> i sistem odmah radi.
+    </div>
+
+    <!-- BRZA REFERENCA -->
+    <h3 style="margin: 28px 0 14px;">📋 Brza referenca — koji handler odabrati</h3>
+    <table class="htable">
+      <thead>
+        <tr>
+          <th>Situacija</th>
+          <th>Handler</th>
+          <th>Treba developer?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Direktan link, URL = base + ID fajla</td>
+          <td style="font-family:monospace; color:var(--accent);">direct</td>
+          <td><span class="badge bg">NE</span></td>
+        </tr>
+        <tr>
+          <td>Direktan link, URL = base + ID + .ekstenzija</td>
+          <td style="font-family:monospace; color:var(--accent);">direct_ext</td>
+          <td><span class="badge bg">NE</span></td>
+        </tr>
+        <tr>
+          <td>Kompletan URL, ništa se ne dodaje</td>
+          <td style="font-family:monospace; color:var(--accent);">direct_full</td>
+          <td><span class="badge bg">NE</span></td>
+        </tr>
+        <tr>
+          <td>API poziv → JSON sa download URL-om unutra</td>
+          <td style="font-family:monospace; color:var(--accent);">api_then_dl</td>
+          <td><span class="badge bg">NE</span></td>
+        </tr>
+        <tr>
+          <td>SSL certifikat nije validan</td>
+          <td style="font-family:monospace; color:var(--accent);">bilo koji + verify_ssl=false</td>
+          <td><span class="badge bg">NE</span></td>
+        </tr>
+        <tr>
+          <td>Login / password zaštita</td>
+          <td style="color:var(--text2);">session_dl (novi)</td>
+          <td><span class="badge br">DA</span></td>
+        </tr>
+        <tr>
+          <td>OAuth / API token</td>
+          <td style="color:var(--text2);">oauth_dl (novi)</td>
+          <td><span class="badge br">DA</span></td>
+        </tr>
+        <tr>
+          <td>Klikanje po stranici (Selenium)</td>
+          <td style="color:var(--text2);">browser_dl (novi)</td>
+          <td><span class="badge br">DA</span></td>
+        </tr>
+        <tr>
+          <td>FTP server</td>
+          <td style="color:var(--text2);">ftp_dl (novi)</td>
+          <td><span class="badge br">DA</span></td>
+        </tr>
+        <tr>
+          <td>Dinamički datum u URL-u</td>
+          <td style="color:var(--text2);">date_dl (novi)</td>
+          <td><span class="badge br">DA</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </section>
+
+</div>
+
+<footer>
+  Scraper Projekat — Dokumentacija generisana uz pomoć Claude AI
+</footer>
+
+</body>
+</html>
