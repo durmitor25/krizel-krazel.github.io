@@ -218,6 +218,49 @@
   .dag-arrow { color: var(--accent2); font-size: 1.5rem; padding: 0 6px; }
 
   footer { text-align: center; padding: 40px; color: var(--text2); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    header { padding: 32px 20px; }
+    header h1 { font-size: 1.6rem; }
+    .container { padding: 20px 16px; }
+    nav { padding: 0 16px; }
+    nav a { padding: 12px 12px; font-size: 0.82rem; }
+    section h2 { font-size: 1.25rem; }
+
+    /* Tree — sakrij komentare na mobu, samo fajlovi */
+    .tree { font-size: 0.78rem; padding: 16px; line-height: 1.9; overflow-x: auto; }
+    .tree .cm { display: none; }
+
+    /* Flow — vertikalno na mobu */
+    .flow { flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px; }
+    .flow-arrow { transform: rotate(90deg); padding: 0; align-self: center; }
+    .flow-step { min-width: unset; width: 100%; text-align: left; display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+    .flow-step .num { min-width: 24px; }
+
+    /* Steps */
+    .step-card { flex-direction: column; }
+    .step-num { min-width: unset; padding: 10px 20px; font-size: 1.1rem; border-right: none; border-bottom: 1px solid var(--border); }
+    .step-body { padding: 14px 16px; }
+
+    /* File grid — 1 kolona */
+    .file-grid { grid-template-columns: 1fr; }
+
+    /* Tables — scroll */
+    .htable, .dbtable { display: block; overflow-x: auto; white-space: nowrap; }
+
+    /* Summary preview */
+    .summary-preview { font-size: 0.7rem; padding: 14px; overflow-x: auto; white-space: nowrap; }
+
+    /* DAG — vertikalno */
+    .dag-tasks { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .dag-arrow { transform: rotate(90deg); align-self: center; }
+    .dag-task { min-width: unset; width: 100%; text-align: left; }
+
+    /* Info box */
+    .info { font-size: 0.82rem; padding: 12px 14px; }
+    .code { font-size: 0.75rem; }
+  }
 </style>
 </head>
 <body>
@@ -342,33 +385,33 @@
     <h2>📁 Struktura projekta</h2>
     <div class="tree">
       <span class="folder">scraper_project/</span><br>
-      &nbsp;&nbsp;├── <span class="folder">config/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># konekcija i čitanje iz baze</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── __init__.py&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># prazan — označava Python paket</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file-main">configdb.py</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># čita scraping + output_path tabelu</span><br>
-      &nbsp;&nbsp;│<br>
-      &nbsp;&nbsp;├── <span class="folder">handlers/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># kako se preuzima svaki tip fajla</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file-main">__init__.py</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># REGISTRY — dispatcher, bira handler</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">direct.py</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># url + file_id → SURS</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">direct_ext.py</span>&nbsp;&nbsp;<span class="cm"># url + file_id + .ext → ZPIZ, PK</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">direct_full.py</span>&nbsp;<span class="cm"># url kompletan → GURS json</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">api_then_dl.py</span>&nbsp;<span class="cm"># API meta → download → GURS zip</span><br>
-      &nbsp;&nbsp;│<br>
-      &nbsp;&nbsp;├── <span class="folder">utils/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># pomoćne funkcije</span><br>
+      &nbsp;&nbsp;├── <span class="folder">config/</span> <span class="cm"># konekcija i čitanje iz baze</span><br>
       &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── __init__.py<br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">logger.py</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># logging u fajl i terminal</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">file_utils.py</span>&nbsp;&nbsp;<span class="cm"># build_filename + save_file helper</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">unzipper.py</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># raspakivanje ZIP → BRONZE</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">check.py</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># provjera loga za greške</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file-main">configdb.py</span> <span class="cm"># čita scraping + output_path</span><br>
       &nbsp;&nbsp;│<br>
-      &nbsp;&nbsp;├── <span class="folder">converters/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># konverzija fajlova u parquet</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file-main">__init__.py</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># convert_all() — pokreće obje konverzije</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">px_converter.py</span><span class="cm"># .px → .parquet (SURS)</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">json_converter.py</span><span class="cm"># .json → .parquet (GURS)</span><br>
+      &nbsp;&nbsp;├── <span class="folder">handlers/</span> <span class="cm"># kako se preuzima svaki tip fajla</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file-main">__init__.py</span> <span class="cm"># registry — bira handler</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">direct.py</span> <span class="cm"># SURS</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">direct_ext.py</span> <span class="cm"># ZPIZ, PK</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">direct_full.py</span> <span class="cm"># GURS json</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">api_then_dl.py</span> <span class="cm"># GURS zip</span><br>
       &nbsp;&nbsp;│<br>
-      &nbsp;&nbsp;├── <span class="folder">dags/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># Airflow automatizacija</span><br>
-      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">scraper_dag.py</span>&nbsp;<span class="cm"># DAG definicija (kad budeš spreman)</span><br>
+      &nbsp;&nbsp;├── <span class="folder">utils/</span> <span class="cm"># pomoćne funkcije</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── __init__.py<br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">logger.py</span> <span class="cm"># logging</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">file_utils.py</span> <span class="cm"># build_filename, save_file</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">unzipper.py</span> <span class="cm"># ZIP → BRONZE</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">check.py</span> <span class="cm"># provjera grešaka u logu</span><br>
       &nbsp;&nbsp;│<br>
-      &nbsp;&nbsp;└── <span class="file-main">main.py</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># ← OVAJ FAJL POKREĆEŠ: python main.py</span>
+      &nbsp;&nbsp;├── <span class="folder">converters/</span> <span class="cm"># konverzija u parquet</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file-main">__init__.py</span> <span class="cm"># convert_all()</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">px_converter.py</span> <span class="cm"># .px → .parquet</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">json_converter.py</span> <span class="cm"># .json → .parquet</span><br>
+      &nbsp;&nbsp;│<br>
+      &nbsp;&nbsp;├── <span class="folder">dags/</span> <span class="cm"># Airflow</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">scraper_dag.py</span> <span class="cm"># DAG definicija</span><br>
+      &nbsp;&nbsp;│<br>
+      &nbsp;&nbsp;└── <span class="file-main">main.py</span> <span class="cm"># ← POKREĆEŠ: python main.py</span>
     </div>
   </section>
 
