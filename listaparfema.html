@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Parfemski vodič</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0908;
+  --bg2: #111009;
+  --bg3: #1a1815;
+  --gold: #c9a84c;
+  --gold2: #e8c97a;
+  --text: #e8e2d9;
+  --muted: #7a7468;
+  --border: rgba(201,168,76,0.15);
+  --border2: rgba(201,168,76,0.3);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { background: var(--bg); }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+header {
+  padding: 2rem 1.25rem 1rem;
+  border-bottom: 0.5px solid var(--border);
+  text-align: center;
+}
+header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: 28px;
+  letter-spacing: 0.08em;
+  color: var(--gold2);
+  font-style: italic;
+}
+header p { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+
+.filters-wrap { padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--border); }
+.filter-label { font-size: 10px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.filter-row:last-child { margin-bottom: 0; }
+
+.fb {
+  padding: 5px 13px;
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.05em;
+  border: 0.5px solid var(--border2);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.fb:hover { color: var(--text); border-color: var(--gold); }
+.fb.active { background: rgba(201,168,76,0.12); color: var(--gold2); border-color: var(--gold); }
+
+.results-bar {
+  padding: 0.75rem 1.25rem;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.cards { padding: 1rem 1rem 4rem; display: flex; flex-direction: column; gap: 12px; }
+
+.card {
+  background: var(--bg3);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.card:active { border-color: var(--border2); }
+
+.card-header {
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 0.5px solid var(--border);
+}
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.card-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; color: var(--gold2); line-height: 1.2; }
+.card-brand { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 0.04em; }
+.tier-badge {
+  font-size: 9px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  margin-left: 8px;
+  margin-top: 2px;
+}
+.t-niche { background: rgba(201,168,76,0.12); color: var(--gold); border: 0.5px solid rgba(201,168,76,0.3); }
+.t-designer { background: rgba(93,202,165,0.1); color: #5DCAA5; border: 0.5px solid rgba(93,202,165,0.25); }
+.t-arabski { background: rgba(215,90,48,0.1); color: #F0997B; border: 0.5px solid rgba(215,90,48,0.25); }
+
+.pill-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.season-pill, .occ-pill {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+}
+.sp-p { background: rgba(29,158,117,0.1); color: #5DCAA5; }
+.sp-l { background: rgba(239,159,39,0.1); color: #EF9F27; }
+.sp-j { background: rgba(216,90,48,0.1); color: #F0997B; }
+.sp-z { background: rgba(55,138,221,0.1); color: #85B7EB; }
+.op-office { background: rgba(55,138,221,0.1); color: #85B7EB; }
+.op-date { background: rgba(212,83,126,0.1); color: #ED93B1; }
+.op-night { background: rgba(127,119,221,0.1); color: #AFA9EC; }
+.op-casual { background: rgba(99,153,34,0.1); color: #97C459; }
+.op-special { background: rgba(201,168,76,0.1); color: var(--gold); }
+
+.card-body { padding: 0.85rem 1rem; }
+.notes-section { margin-bottom: 0.75rem; }
+.nl { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px; margin-top: 8px; }
+.nl:first-child { margin-top: 0; }
+.note-pills { display: flex; flex-wrap: wrap; gap: 3px; }
+.np {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 0.5px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: rgba(232,226,217,0.7);
+}
+.np-sand { background: rgba(201,168,76,0.08); color: #c9a84c; border-color: rgba(201,168,76,0.2); }
+.np-amber { background: rgba(186,117,23,0.1); color: #EF9F27; border-color: rgba(186,117,23,0.2); }
+.np-musk { background: rgba(127,119,221,0.08); color: #AFA9EC; border-color: rgba(127,119,221,0.2); }
+.np-oud { background: rgba(99,56,6,0.3); color: #EF9F27; border-color: rgba(186,117,23,0.3); }
+.np-van { background: rgba(99,153,34,0.08); color: #97C459; border-color: rgba(99,153,34,0.2); }
+.np-wood { background: rgba(95,94,90,0.15); color: #B4B2A9; border-color: rgba(95,94,90,0.25); }
+.np-spice { background: rgba(162,45,45,0.1); color: #F09595; border-color: rgba(162,45,45,0.2); }
+.np-citrus { background: rgba(24,95,165,0.1); color: #85B7EB; border-color: rgba(24,95,165,0.2); }
+.np-leather { background: rgba(68,68,65,0.2); color: #B4B2A9; border-color: rgba(68,68,65,0.3); }
+.np-floral { background: rgba(114,36,62,0.1); color: #ED93B1; border-color: rgba(114,36,62,0.2); }
+.np-tobacco { background: rgba(65,36,2,0.3); color: #FAC775; border-color: rgba(101,56,6,0.3); }
+.np-incense { background: rgba(38,33,92,0.2); color: #AFA9EC; border-color: rgba(83,74,183,0.2); }
+
+.vibe {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-style: italic;
+  padding-top: 0.6rem;
+  border-top: 0.5px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+.skin-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.skin-dot { width: 5px; height: 5px; border-radius: 50%; background: #1D9E75; flex-shrink: 0; }
+.skin-dot.warn { background: #EF9F27; }
+
+.empty {
+  text-align: center;
+  padding: 3rem 1.25rem;
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.divider { height: 0.5px; background: var(--border); margin: 6px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Parfemski vodič</h1>
+  <p>Preporuke za tvoju kožu</p>
+</header>
+
+<div class="filters-wrap">
+  <div class="filter-label">Godišnje doba</div>
+  <div class="filter-row" id="season-filters">
+    <button class="fb active" onclick="setSeason('sve',this)">Sve sezone</button>
+    <button class="fb" onclick="setSeason('proljece',this)">Proljeće</button>
+    <button class="fb" onclick="setSeason('ljeto',this)">Ljeto</button>
+    <button class="fb" onclick="setSeason('jesen',this)">Jesen</button>
+    <button class="fb" onclick="setSeason('zima',this)">Zima</button>
+  </div>
+  <div class="filter-label">Prigoda / Tip</div>
+  <div class="filter-row" id="occ-filters">
+    <button class="fb active" onclick="setOcc('sve',this)">Sve</button>
+    <button class="fb" onclick="setOcc('office',this)">Kancelarija</button>
+    <button class="fb" onclick="setOcc('date',this)">Dejt</button>
+    <button class="fb" onclick="setOcc('night',this)">Večera / Klub</button>
+    <button class="fb" onclick="setOcc('casual',this)">Casual</button>
+    <button class="fb" onclick="setOcc('special',this)">Posebna prigoda</button>
+    <button class="fb" onclick="setOcc('niche',this)">Nišni</button>
+    <button class="fb" onclick="setOcc('designer',this)">Designer</button>
+    <button class="fb" onclick="setOcc('arabski',this)">Arapski</button>
+  </div>
+</div>
+
+<div class="results-bar" id="info"></div>
+<div class="cards" id="cards"></div>
+
+<script>
+const parfemi = [
+  {
+    name:'Bleu de Chanel Parfum', brand:'Chanel', tier:'designer', tierLabel:'Designer',
+    sezone:['proljece','ljeto','jesen'],
+    spCls:['sp-p','sp-l','sp-j'], spLabel:['Proljeće','Ljeto','Jesen'],
+    occ:['office','date','casual'],
+    occLabel:['Kancelarija','Dejt','Casual'], occCls:['op-office','op-date','op-casual'],
+    top:[['Citrus','np-citrus'],['Bergamot','np-citrus'],['Biber','np-spice']],
+    srce:[['Sandalovina','np-sand'],['Cedar','np-wood'],['Tamjan','np-leather']],
+    baza:[['Amber','np-amber'],['Musk','np-musk'],['Tonka','np-amber'],['Labdanum','np-leather']],
+    vibe:'Klasičan i svestran — citrus otvaranje, drveno-amber baza. Radi u 3 sezone.',
+    skin:true
+  },
+  {
+    name:'Creed Aventus', brand:'Creed', tier:'niche', tierLabel:'Nišni',
+    sezone:['proljece','jesen'],
+    spCls:['sp-p','sp-j'], spLabel:['Proljeće','Jesen'],
+    occ:['office','date','casual'],
+    occLabel:['Kancelarija','Dejt','Casual'], occCls:['op-office','op-date','op-casual'],
+    top:[['Ananas','np-citrus'],['Bergamot','np-citrus'],['Crna ribizla','np-floral']],
+    srce:[['Breza','np-wood'],['Jasmin','np-floral'],['Pačuli','np-wood']],
+    baza:[['Ambergris','np-musk'],['Musk','np-musk'],['Hrastova mahovina','np-wood'],['Vanilija','np-van']],
+    vibe:'Kultni nišni — voćno-drveni. Proljeće i jesen su mu idealne sezone. 12h+.',
+    skin:true
+  },
+  {
+    name:'Amouage Reflection Man', brand:'Amouage', tier:'niche', tierLabel:'Nišni',
+    sezone:['ljeto','proljece'],
+    spCls:['sp-l','sp-p'], spLabel:['Ljeto','Proljeće'],
+    occ:['office','date','casual'],
+    occLabel:['Kancelarija','Dejt','Casual'], occCls:['op-office','op-date','op-casual'],
+    top:[['Neroli','np-floral'],['Bergamot','np-citrus'],['Ruzmarin','np-wood']],
+    srce:[['Jasmin','np-floral'],['Ljiljan','np-floral']],
+    baza:[['Sandalovina','np-sand'],['Amber','np-amber'],['Musk','np-musk'],['Vetiver','np-wood']],
+    vibe:'Lagano cvjetno-drveni Amouage. Nije pretežak za ljeto. Elegantan i diskretan.',
+    skin:true
+  },
+  {
+    name:'Tom Ford Oud Wood', brand:'Tom Ford · Private Blend', tier:'designer', tierLabel:'Designer',
+    sezone:['jesen','zima'],
+    spCls:['sp-j','sp-z'], spLabel:['Jesen','Zima'],
+    occ:['date','night','special'],
+    occLabel:['Dejt','Večera','Posebna prigoda'], occCls:['op-date','op-night','op-special'],
+    top:[['Kardamom','np-spice'],['Ružino drvo','np-wood']],
+    srce:[['Oud','np-oud'],['Sečuanski biber','np-spice'],['Vetiver','np-wood']],
+    baza:[['Sandalovina','np-sand'],['Vanilija','np-van'],['Amber','np-amber'],['Tonka','np-amber']],
+    vibe:'Kremasti oud + sandalovina. Toplina jeseni i zime ga savršeno aktivira.',
+    skin:true
+  },
+  {
+    name:'Armani Code Profumo', brand:'Giorgio Armani', tier:'designer', tierLabel:'Designer',
+    sezone:['jesen','zima'],
+    spCls:['sp-j','sp-z'], spLabel:['Jesen','Zima'],
+    occ:['office','date'],
+    occLabel:['Kancelarija','Dejt'], occCls:['op-office','op-date'],
+    top:[['Bergamot','np-citrus'],['Kardamom','np-spice'],['Jabuka','np-floral']],
+    srce:[['Koža','np-leather'],['Oliveno drvo','np-wood']],
+    baza:[['Amber','np-amber'],['Tonka','np-amber'],['Musk','np-musk'],['Gvajak','np-wood']],
+    vibe:'Topao i bogat — amber + tonka baza savršena za hladne dane.',
+    skin:true
+  },
+  {
+    name:"Penhaligon's Halfeti", brand:"Penhaligon's", tier:'niche', tierLabel:'Nišni',
+    sezone:['jesen','zima'],
+    spCls:['sp-j','sp-z'], spLabel:['Jesen','Zima'],
+    occ:['date','night','special'],
+    occLabel:['Dejt','Večera','Posebna prigoda'], occCls:['op-date','op-night','op-special'],
+    top:[['Grejpfrut','np-citrus'],['Bergamot','np-citrus'],['Šafran','np-spice']],
+    srce:[['Crna ruža','np-floral'],['Jasmin','np-floral'],['Kardamom','np-spice']],
+    baza:[['Oud','np-oud'],['Sandalovina','np-sand'],['Amber','np-amber'],['Vanilija','np-van'],['Koža','np-leather'],['Musk','np-musk']],
+    vibe:'Kompleksna tamna orijentalna kompozicija. 7–9h. Jesen i zima joj daju puni potencijal.',
+    skin:true
+  },
+  {
+    name:"Prada L'Homme Intense", brand:"Prada", tier:'designer', tierLabel:'Designer',
+    sezone:['jesen'],
+    spCls:['sp-j'], spLabel:['Jesen'],
+    occ:['office','date','casual'],
+    occLabel:['Kancelarija','Dejt','Casual'], occCls:['op-office','op-date','op-casual'],
+    top:[['Iris','np-floral'],['Amber','np-amber']],
+    srce:[['Koža','np-leather'],['Pačuli','np-wood']],
+    baza:[['Sandalovina','np-sand'],['Cedar','np-wood'],['Amber','np-amber'],['Musk','np-musk']],
+    vibe:'Iris + sandalovina cvjeta u jesenjem hladnom zraku. Provjeri na koži.',
+    skin:false
+  },
+  {
+    name:'Dior Sauvage Elixir', brand:'Dior', tier:'designer', tierLabel:'Designer',
+    sezone:['zima','jesen'],
+    spCls:['sp-z','sp-j'], spLabel:['Zima','Jesen'],
+    occ:['date','night','special'],
+    occLabel:['Dejt','Večera','Posebna prigoda'], occCls:['op-date','op-night','op-special'],
+    top:[['Grejpfrut','np-citrus'],['Cimet','np-spice'],['Muškatni oraščić','np-spice']],
+    srce:[['Lavanda','np-floral'],['Kardamom','np-spice']],
+    baza:[['Sandalovina','np-sand'],['Amber','np-amber'],['Vetiver','np-wood'],['Likoriš','np-leather']],
+    vibe:'Beast mode zimi — ambroxan + hladnoća = ogromna projekcija čak i na suhoj koži.',
+    skin:true
+  },
+  {
+    name:'MFK Oud Satin Mood', brand:'Maison Francis Kurkdjian', tier:'niche', tierLabel:'Nišni',
+    sezone:['zima'],
+    spCls:['sp-z'], spLabel:['Zima'],
+    occ:['date','night','special'],
+    occLabel:['Dejt','Večera','Posebna prigoda'], occCls:['op-date','op-night','op-special'],
+    top:[['Ljubičica','np-floral'],['Bugarska ruža','np-floral']],
+    srce:[['Turska ruža','np-floral']],
+    baza:[['Laoški oud','np-oud'],['Vanilija','np-van'],['Amber','np-amber'],['Musk','np-musk']],
+    vibe:'Svilenkasti orijentalni oud s ružom. Zima mu je prirodno okruženje. Seduktivan.',
+    skin:true
+  },
+  {
+    name:'Mancera Red Tobacco', brand:'Mancera', tier:'niche', tierLabel:'Nišni',
+    sezone:['zima','jesen'],
+    spCls:['sp-z','sp-j'], spLabel:['Zima','Jesen'],
+    occ:['night','special'],
+    occLabel:['Večera','Posebna prigoda'], occCls:['op-night','op-special'],
+    top:[['Šafran','np-spice'],['Cimet','np-spice'],['Tamjan','np-incense'],['Breskva','np-floral']],
+    srce:[['Duhan','np-tobacco'],['Jasmin','np-floral'],['Pačuli','np-wood']],
+    baza:[['Amber','np-amber'],['Vanilija','np-van'],['Vetiver','np-wood'],['Bijeli musk','np-musk']],
+    vibe:'Dimljeni duhan + amber. 8–18h trajanje. Savršen za hladne noći.',
+    skin:true
+  },
+  {
+    name:'Lattafa Raghba Wood Intense', brand:'Lattafa', tier:'arabski', tierLabel:'Arapski',
+    sezone:['zima','jesen'],
+    spCls:['sp-z','sp-j'], spLabel:['Zima','Jesen'],
+    occ:['night','casual'],
+    occLabel:['Večera','Casual'], occCls:['op-night','op-casual'],
+    top:[['Šafran','np-spice'],['Bergamot','np-citrus']],
+    srce:[['Oud','np-oud'],['Cedar','np-wood'],['Ruža','np-floral']],
+    baza:[['Amber','np-amber'],['Vanilija','np-van'],['Musk','np-musk'],['Koža','np-leather']],
+    vibe:'Arapski oud za zimu. Smolasta baza odlično drži na suhoj koži. Odlična vrijednost.',
+    skin:true
+  },
+  {
+    name:'Armaf Club de Nuit Intense', brand:'Armaf', tier:'arabski', tierLabel:'Arapski',
+    sezone:['proljece','jesen'],
+    spCls:['sp-p','sp-j'], spLabel:['Proljeće','Jesen'],
+    occ:['office','casual'],
+    occLabel:['Kancelarija','Casual'], occCls:['op-office','op-casual'],
+    top:[['Ananas','np-citrus'],['Bergamot','np-citrus'],['Crna ribizla','np-floral']],
+    srce:[['Ruža','np-floral'],['Jasmin','np-floral'],['Breza','np-wood']],
+    baza:[['Ambergris','np-musk'],['Musk','np-musk'],['Koža','np-leather'],['Vanilija','np-van']],
+    vibe:'Arapski klon Creed Aventus-a. Odlična vrijednost, 10h+ trajanje.',
+    skin:true
+  }
+];
+
+let activeSeason='sve', activeOcc='sve';
+
+function setSeason(v,btn){
+  activeSeason=v;
+  document.querySelectorAll('#season-filters .fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+function setOcc(v,btn){
+  activeOcc=v;
+  document.querySelectorAll('#occ-filters .fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+function matches(p){
+  const sOK = activeSeason==='sve'||p.sezone.includes(activeSeason);
+  const oOK = activeOcc==='sve'||activeOcc===p.tier||p.occ.includes(activeOcc);
+  return sOK&&oOK;
+}
+function render(){
+  const visible=parfemi.filter(matches);
+  document.getElementById('info').textContent=`Prikazano ${visible.length} od ${parfemi.length} parfema`;
+  if(!visible.length){
+    document.getElementById('cards').innerHTML='<div class="empty">Nema parfema za ovu kombinaciju.</div>';
+    return;
+  }
+  document.getElementById('cards').innerHTML=visible.map(p=>{
+    const tCls=p.tier==='niche'?'t-niche':p.tier==='arabski'?'t-arabski':'t-designer';
+    return `<div class="card">
+      <div class="card-header">
+        <div class="card-top">
+          <div><div class="card-name">${p.name}</div><div class="card-brand">${p.brand}</div></div>
+          <span class="tier-badge ${tCls}">${p.tierLabel}</span>
+        </div>
+        <div class="pill-row" style="margin-bottom:6px">
+          ${p.spLabel.map((s,i)=>`<span class="season-pill ${p.spCls[i]}">${s}</span>`).join('')}
+        </div>
+        <div class="pill-row">
+          ${p.occLabel.map((o,i)=>`<span class="occ-pill ${p.occCls[i]}">${o}</span>`).join('')}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="notes-section">
+          <div class="nl">Top note</div>
+          <div class="note-pills">${p.top.map(n=>`<span class="np ${n[1]}">${n[0]}</span>`).join('')}</div>
+          <div class="nl">Srce</div>
+          <div class="note-pills">${p.srce.map(n=>`<span class="np ${n[1]}">${n[0]}</span>`).join('')}</div>
+          <div class="nl">Baza</div>
+          <div class="note-pills">${p.baza.map(n=>`<span class="np ${n[1]}">${n[0]}</span>`).join('')}</div>
+        </div>
+        <div class="vibe">${p.vibe}</div>
+        <div class="skin-row">
+          <div class="skin-dot ${p.skin?'':'warn'}"></div>
+          <span>${p.skin?'Dobro za tvoju kožu':'Provjeri na koži'}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+render();
+</script>
+</body>
+</html>
