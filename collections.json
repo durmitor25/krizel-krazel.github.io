@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "collections": [
+    {
+      "slug": "contact",
+      "name": "Contact inquiries",
+      "mode": "inbox",
+      "fields": [
+        { "key": "name", "label": "Name", "type": "text", "required": true },
+        { "key": "email", "label": "Email", "type": "email", "required": true },
+        { "key": "project_type", "label": "Project type", "type": "select", "required": true, "options": ["Editorial", "Landscape", "Portrait", "Commercial", "Other"] },
+        { "key": "message", "label": "Message", "type": "textarea", "required": true }
+      ]
+    }
+  ]
+}
